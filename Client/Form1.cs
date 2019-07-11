@@ -14,7 +14,7 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-        string server_addr = "192.168.1.5";
+        string server_addr = "127.0.0.1";
         int server_port = 7777;
         TcpClient client;
 
