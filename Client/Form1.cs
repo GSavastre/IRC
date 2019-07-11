@@ -22,18 +22,12 @@ namespace Client
         {
             InitializeComponent();
             
-            try
-            {
-                client = new TcpClient(server_addr, server_port);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Client Istance Exception : " + ex.ToString());
-            }
         }
 
         private void btn_test_Click(object sender, EventArgs e)
         {
+            client = new TcpClient(server_addr, server_port);
+
             int msgLenght = Encoding.ASCII.GetByteCount(tb_test.Text);  //lunghezza in byte del messaggio
             byte[] msg_data = new byte[msgLenght];                      //inzializzo array con dim = lunghezza del messaggio
             msg_data = Encoding.ASCII.GetBytes(tb_test.Text);           //inserisco nell array il messaggio in byte
@@ -41,6 +35,7 @@ namespace Client
             NetworkStream stream = client.GetStream();
             stream.Write(msg_data, 0, msgLenght);
             stream.Close();
+            client.Close();
         }
     }
 }
