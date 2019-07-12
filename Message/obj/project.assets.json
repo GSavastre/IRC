@@ -179,23 +179,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Mattia\\.nuget\\packages\\": {},
+    "C:\\Users\\cosmi\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mattia\\Desktop\\IRC\\Message\\IRC.csproj",
+      "projectUniqueName": "C:\\Users\\cosmi\\Documents\\Uni\\Reti\\IRC\\Message\\IRC.csproj",
       "projectName": "IRC",
-      "projectPath": "C:\\Users\\Mattia\\Desktop\\IRC\\Message\\IRC.csproj",
-      "packagesPath": "C:\\Users\\Mattia\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mattia\\Desktop\\IRC\\Message\\obj\\",
+      "projectPath": "C:\\Users\\cosmi\\Documents\\Uni\\Reti\\IRC\\Message\\IRC.csproj",
+      "packagesPath": "C:\\Users\\cosmi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\cosmi\\Documents\\Uni\\Reti\\IRC\\Message\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Mattia\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\cosmi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
