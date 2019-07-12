@@ -1,0 +1,9 @@
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\bin\Debug\netcoreapp2.1\irc.deps.json
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\bin\Debug\netcoreapp2.1\irc.dll
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\bin\Debug\netcoreapp2.1\irc.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.csprojAssemblyReference.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.csproj.CoreCompileInputs.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.AssemblyInfoInputs.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.AssemblyInfo.cs
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.dll
+C:\Users\cosmi\Documents\Uni\Reti\IRC\irc\obj\Debug\netcoreapp2.1\irc.pdb

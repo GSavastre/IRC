@@ -18,3 +18,13 @@ C:\Users\Mattia\Desktop\IRC\Client\obj\Debug\Client.csproj.GenerateResource.cach
 C:\Users\Mattia\Desktop\IRC\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
 C:\Users\Mattia\Desktop\IRC\Client\obj\Debug\Client.exe
 C:\Users\Mattia\Desktop\IRC\Client\obj\Debug\Client.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\bin\Debug\Client.exe.config
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\bin\Debug\Client.exe
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\bin\Debug\Client.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csprojAssemblyReference.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.Form1.resources
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.Properties.Resources.resources
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.GenerateResource.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.exe
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.pdb

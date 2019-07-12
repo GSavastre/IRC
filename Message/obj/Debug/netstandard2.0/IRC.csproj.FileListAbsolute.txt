@@ -1,0 +1,8 @@
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\bin\Debug\netstandard2.0\IRC.deps.json
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\bin\Debug\netstandard2.0\IRC.dll
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\bin\Debug\netstandard2.0\IRC.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.csproj.CoreCompileInputs.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfoInputs.cache
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb

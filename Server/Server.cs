@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Server
 {
@@ -20,9 +18,7 @@ namespace Server
             try
             {
                 server.Start();
-                Console.WriteLine("Server started");
-                     
-
+                Console.WriteLine("Server started...");
             }
             catch (SocketException e)
             {
@@ -34,11 +30,14 @@ namespace Server
             {
                 client = server.AcceptTcpClient();
 
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[1024];
                 NetworkStream stream = client.GetStream();
 
                 stream.Read(buffer, 0, buffer.Length);
 
+                Console.WriteLine(BytesToObj(buffer).message);
+
+                /*
                 StringBuilder msg = new StringBuilder();
 
                 foreach(byte b in buffer)
@@ -47,10 +46,43 @@ namespace Server
                         break;
                     else
                         msg.Append(Convert.ToChar(b).ToString());
-
                 }
 
-                Console.WriteLine(msg+" "+buffer.Length);
+                Console.WriteLine(msg);
+                */
+            }
+        }
+
+        /// <summary>
+        ///  Converte un Oggetto qualsiasi in un array di byte
+        /// </summary>
+        /// <param msg="obj Message da convertire">
+        /// </param>
+        private byte[] ObjToBytes(Message msg)
+        {
+
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, msg);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        ///  Converte un array di byte 
+        /// </summary>
+        /// <param msg="array di byte da convertire">
+        /// </param>
+        private Message BytesToObj(byte[] msg)
+        {
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                ms.Write(msg, 0, msg.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                return (Message)bf.Deserialize(ms);
             }
         }
 

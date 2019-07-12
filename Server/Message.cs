@@ -1,28 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Sockets;
 using System.Net;
 
 namespace Server
 {
+    [Serializable]
     class Message
     {
         public IPAddress ipSender;
         public int portSender;
-        public IPAddress ipReciver;
-        public int portReciver;
+        public string receiver_username;
         public string message;
-        public int hashCode; //TODO
+        //public int hashCode; TODO
 
-        public Message(IPAddress myIpSender, int myPortSender, IPAddress myIpReciver, int myPortReciver, string myMessage)
+        public Message(IPAddress myIpSender, int myPortSender, string myReceiver_username, string myMessage)
         {
             ipSender = myIpSender;
             portSender = myPortSender;
-            ipReciver = myIpReciver;
-            portReciver = myPortReciver;
+            receiver_username = myReceiver_username;
             message = myMessage;
         }
 
