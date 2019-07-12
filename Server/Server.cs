@@ -20,9 +20,7 @@ namespace Server
             try
             {
                 server.Start();
-                Console.WriteLine("Server started");
-                     
-
+                Console.WriteLine("Server started...");
             }
             catch (SocketException e)
             {
@@ -32,6 +30,7 @@ namespace Server
 
             while (true)
             {
+                Console.WriteLine("Waiting...");
                 client = server.AcceptTcpClient();
 
                 byte[] buffer = new byte[256];
@@ -47,13 +46,10 @@ namespace Server
                         break;
                     else
                         msg.Append(Convert.ToChar(b).ToString());
-
                 }
-
-                Console.WriteLine(msg+" "+buffer.Length);
+                Console.WriteLine(msg);
             }
         }
-
     }
 
     
