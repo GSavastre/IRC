@@ -6,3 +6,4 @@ C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.Assem
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.csprojAssemblyReference.cache

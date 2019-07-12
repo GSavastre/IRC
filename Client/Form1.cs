@@ -24,17 +24,10 @@ namespace Client
         {
             client = new TcpClient(server_addr, server_port);
 
-            /*
-            int msgLenght = Encoding.ASCII.GetByteCount(tb_test.Text);  //lunghezza in byte del messaggio
-            byte[] msg_data = new byte[msgLenght];                      //inzializzo array con dim = lunghezza del messaggio
-            msg_data = Encoding.ASCII.GetBytes(tb_test.Text);           //inserisco nell array il messaggio in byte
-            */
-
-            Message msg = new Message(IPAddress.Parse(server_addr), server_port, "bot_user", btn_test.Text);
+            ircMessage msg = new ircMessage(IPAddress.Parse(server_addr), server_port, "bot_user", tb_test.Text);
 
             NetworkStream stream = client.GetStream();
             stream.Write(ObjToBytes(msg), 0, ObjToBytes(msg).Length);
-            tb_test.Text = ObjToBytes(msg).Length.ToString();
 
             stream.Close();
             client.Close();
@@ -45,7 +38,7 @@ namespace Client
         /// </summary>
         /// <param msg="obj Message da convertire">
         /// </param>
-        private byte[] ObjToBytes(Message msg)
+        private byte[] ObjToBytes(ircMessage msg)
         {
 
             BinaryFormatter bf = new BinaryFormatter();
@@ -61,7 +54,7 @@ namespace Client
         /// </summary>
         /// <param msg="array di byte da convertire">
         /// </param>
-        private Message BytesToObj(byte[] msg)
+        private ircMessage BytesToObj(byte[] msg)
         {
 
             using (MemoryStream ms = new MemoryStream())
@@ -69,7 +62,7 @@ namespace Client
                 BinaryFormatter bf = new BinaryFormatter();
                 ms.Write(msg, 0, msg.Length);
                 ms.Seek(0, SeekOrigin.Begin);
-                return (Message)bf.Deserialize(ms);
+                return (ircMessage)bf.Deserialize(ms);
             }
         }
     }

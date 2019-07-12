@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net;
 
-namespace Message
+namespace irc
 {
     [Serializable]
-    public class Message
+    public class ircMessage
     {
         public IPAddress ipSender;
         public int portSender;
@@ -12,7 +12,7 @@ namespace Message
         public string message;
         //public int hashCode; TODO
 
-        public Message(IPAddress myIpSender, int myPortSender, string myReceiver_username, string myMessage)
+        public ircMessage(IPAddress myIpSender, int myPortSender, string myReceiver_username, string myMessage)
         {
             ipSender = myIpSender;
             portSender = myPortSender;

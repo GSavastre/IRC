@@ -55,5 +55,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Message\IRC.csproj">
+      <Project>{84e7bee7-3787-4c78-8aae-a1453ef6989e}</Project>
+      <Name>IRC</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

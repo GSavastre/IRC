@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using irc;
 
 namespace Server
 {
@@ -58,7 +59,7 @@ namespace Server
         /// </summary>
         /// <param msg="obj Message da convertire">
         /// </param>
-        private byte[] ObjToBytes(Message msg)
+        private byte[] ObjToBytes(ircMessage msg)
         {
 
             BinaryFormatter bf = new BinaryFormatter();
@@ -74,7 +75,7 @@ namespace Server
         /// </summary>
         /// <param msg="array di byte da convertire">
         /// </param>
-        private Message BytesToObj(byte[] msg)
+        private ircMessage BytesToObj(byte[] msg)
         {
 
             using (MemoryStream ms = new MemoryStream())
@@ -82,7 +83,7 @@ namespace Server
                 BinaryFormatter bf = new BinaryFormatter();
                 ms.Write(msg, 0, msg.Length);
                 ms.Seek(0, SeekOrigin.Begin);
-                return (Message)bf.Deserialize(ms);
+                return (ircMessage)bf.Deserialize(ms);
             }
         }
 
