@@ -16,7 +16,23 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Chat());
+            Form loginForm = new Login();
+            Form regForm = new Register();
+
+            bool loop = true;
+            while (loop)
+            {
+                if (loginForm.ShowDialog() == DialogResult.Yes) {
+
+                    if (regForm.ShowDialog() == DialogResult.Yes) { }
+                    else
+                        loop = false;
+                }
+                else
+                    loop = false;
+            }
+
+            //Application.Run(new Form1());
         }
     }
 }
