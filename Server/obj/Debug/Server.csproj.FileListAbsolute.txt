@@ -1,17 +1,7 @@
-<<<<<<< HEAD
-C:\Users\Mattia\Desktop\IRC\Server\bin\Debug\Server.exe.config
-C:\Users\Mattia\Desktop\IRC\Server\bin\Debug\Server.exe
-C:\Users\Mattia\Desktop\IRC\Server\bin\Debug\Server.pdb
-C:\Users\Mattia\Desktop\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache
-C:\Users\Mattia\Desktop\IRC\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
-C:\Users\Mattia\Desktop\IRC\Server\obj\Debug\Server.exe
-C:\Users\Mattia\Desktop\IRC\Server\obj\Debug\Server.pdb
-=======
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe.config
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.pdb
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.exe
-C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.pdb
->>>>>>> develop
+C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.exe.config
+C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.exe
+C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.pdb
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.exe
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.pdb
