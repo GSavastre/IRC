@@ -37,20 +37,6 @@ namespace Server
                 stream.Read(buffer, 0, buffer.Length);
 
                 Console.WriteLine(BytesToObj(buffer).message);
-
-                /*
-                StringBuilder msg = new StringBuilder();
-
-                foreach(byte b in buffer)
-                {
-                    if (b.Equals(00))
-                        break;
-                    else
-                        msg.Append(Convert.ToChar(b).ToString());
-                }
-
-                Console.WriteLine(msg);
-                */
             }
         }
 
@@ -61,7 +47,6 @@ namespace Server
         /// </param>
         private byte[] ObjToBytes(ircMessage msg)
         {
-
             BinaryFormatter bf = new BinaryFormatter();
             using (MemoryStream ms = new MemoryStream())
             {
@@ -77,7 +62,6 @@ namespace Server
         /// </param>
         private ircMessage BytesToObj(byte[] msg)
         {
-
             using (MemoryStream ms = new MemoryStream())
             {
                 BinaryFormatter bf = new BinaryFormatter();
@@ -86,7 +70,6 @@ namespace Server
                 return (ircMessage)bf.Deserialize(ms);
             }
         }
-
     }
 
     
