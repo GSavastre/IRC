@@ -38,7 +38,7 @@
             // 
             // btn_login
             // 
-            this.btn_login.Location = new System.Drawing.Point(166, 166);
+            this.btn_login.Location = new System.Drawing.Point(149, 115);
             this.btn_login.Name = "btn_login";
             this.btn_login.Size = new System.Drawing.Size(108, 51);
             this.btn_login.TabIndex = 0;
@@ -48,9 +48,9 @@
             // 
             // btn_switch_reg
             // 
-            this.btn_switch_reg.Location = new System.Drawing.Point(319, 222);
+            this.btn_switch_reg.Location = new System.Drawing.Point(149, 172);
             this.btn_switch_reg.Name = "btn_switch_reg";
-            this.btn_switch_reg.Size = new System.Drawing.Size(83, 23);
+            this.btn_switch_reg.Size = new System.Drawing.Size(108, 23);
             this.btn_switch_reg.TabIndex = 1;
             this.btn_switch_reg.Text = "Registrazione";
             this.btn_switch_reg.UseVisualStyleBackColor = true;
@@ -58,22 +58,25 @@
             // 
             // tb_log_username
             // 
-            this.tb_log_username.Location = new System.Drawing.Point(134, 46);
+            this.tb_log_username.Location = new System.Drawing.Point(108, 35);
             this.tb_log_username.Name = "tb_log_username";
             this.tb_log_username.Size = new System.Drawing.Size(240, 20);
             this.tb_log_username.TabIndex = 2;
+            this.tb_log_username.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tb_log_password
             // 
-            this.tb_log_password.Location = new System.Drawing.Point(134, 111);
+            this.tb_log_password.Location = new System.Drawing.Point(108, 77);
             this.tb_log_password.Name = "tb_log_password";
             this.tb_log_password.Size = new System.Drawing.Size(240, 20);
             this.tb_log_password.TabIndex = 3;
+            this.tb_log_password.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tb_log_password.UseSystemPasswordChar = true;
             // 
             // lb_username
             // 
             this.lb_username.AutoSize = true;
-            this.lb_username.Location = new System.Drawing.Point(43, 53);
+            this.lb_username.Location = new System.Drawing.Point(34, 38);
             this.lb_username.Name = "lb_username";
             this.lb_username.Size = new System.Drawing.Size(55, 13);
             this.lb_username.TabIndex = 4;
@@ -82,7 +85,7 @@
             // lb_password
             // 
             this.lb_password.AutoSize = true;
-            this.lb_password.Location = new System.Drawing.Point(45, 114);
+            this.lb_password.Location = new System.Drawing.Point(34, 80);
             this.lb_password.Name = "lb_password";
             this.lb_password.Size = new System.Drawing.Size(53, 13);
             this.lb_password.TabIndex = 5;
@@ -92,14 +95,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 255);
+            this.ClientSize = new System.Drawing.Size(413, 220);
             this.Controls.Add(this.lb_password);
             this.Controls.Add(this.lb_username);
             this.Controls.Add(this.tb_log_password);
             this.Controls.Add(this.tb_log_username);
             this.Controls.Add(this.btn_switch_reg);
             this.Controls.Add(this.btn_login);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.Name = "Login";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
             this.ResumeLayout(false);
             this.PerformLayout();

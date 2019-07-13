@@ -16,6 +16,7 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            /*
             Form loginForm = new Login();
             Form regForm = new Register();
 
@@ -31,8 +32,8 @@ namespace Client
                 else
                     loop = false;
             }
-
-            //Application.Run(new Form1());
+            */
+            Application.Run(new Home());
         }
     }
 }
