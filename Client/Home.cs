@@ -7,7 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Sockets;
+using System.Net;
 using irc;
+
 
 namespace Client
 {
@@ -30,6 +33,22 @@ namespace Client
 
             l_user.Text = current_user.username;
         }
+
+        void DiscoverServers() {
+            UdpClient client = new UdpClient();
+            byte[] requestData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
+            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+            client.EnableBroadcast = true;
+            client.Send(requestData, requestData.Length, new IPEndPoint(IPAddress.Broadcast, 7777));
+
+            string serverResponse = Encoding.ASCII.GetString(client.Receive(ref serverEndPoint));
+            Console.WriteLine($"Received {serverResponse} from {serverEndPoint.Address.ToString()}");
+
+            client.Close();
+        }
+
+
 
         
         void LoadContacts(List<ircUser> users) {
