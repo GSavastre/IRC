@@ -16,7 +16,9 @@ namespace Server
         //Il messaggio di richiesta dovrà corrispondere a questa stringa
         private static byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
 
-        //Porta su cui il server gestirà le comunicazioni
+        //Porta su cui il server gestirà le comunicazioni discovery
+        private const int discoveryPort = 7778;
+
         private const int port = 7777;
 
         //Creo nuovo socket UDP su cui ascoltare le richieste dei client
@@ -26,7 +28,7 @@ namespace Server
         {
             //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
             //Usando port indico alla socket che deve ascoltare su quella specifica porta
-            serverListener.Bind(new IPEndPoint(IPAddress.Any,port));
+            serverListener.Bind(new IPEndPoint(IPAddress.Any,discoveryPort));
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             Console.WriteLine("Server listening...");
