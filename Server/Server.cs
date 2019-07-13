@@ -10,21 +10,38 @@ namespace Server
 {
     class Server
     {
-        private UdpClient serverListener;
-        private static byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_RESPONSE");
+        //private UdpClient serverListener;
+        private static byte[] listenerResponseData = Encoding.ASCII.GetBytes("ACK");
         private static string listenerRequestCheck = "DISCOVER_IRCSERVER_REQUEST";
+        const int port = 7777;
+        Socket server = new Socket(AddressFamily.InterNetwork,SocketType.Dgram,ProtocolType.Udp);
+        
 
         public Server()
         {
-            int port = 7777;
+            //int port = 7777;
+            server.Bind(new IPEndPoint(IPAddress.Any,port));
             IPAddress ip = IPAddress.Parse("127.0.0.1");
-            TcpListener server = new TcpListener (ip, port);
-            TcpClient client = default(TcpClient);
+            Console.WriteLine("Server listening...");
+            /*TcpListener server = new TcpListener (ip, port);
+            TcpClient client = default(TcpClient);*/
 
-            serverListener = new UdpClient(port);
+            while (true) {
+                IPEndPoint sender = new IPEndPoint(IPAddress.Any,0);
+                EndPoint tempRemoteEP = (EndPoint)sender;
+                byte[] buffer = new byte[Encoding.ASCII.GetByteCount(listenerRequestCheck)];
+                server.ReceiveFrom(buffer,ref tempRemoteEP);
+                Console.WriteLine($"Server got {Encoding.ASCII.GetString(buffer)} from {tempRemoteEP.ToString()}");
+
+                Console.WriteLine($"Sending {Encoding.ASCII.GetString(listenerResponseData)} to {tempRemoteEP.ToString()}");
+
+                server.SendTo(listenerResponseData, tempRemoteEP);
+            }
+
+            //serverListener = new UdpClient(port);
             
 
-            try
+            /*try
             {
                 server.Start();
                 Console.WriteLine("Server started...");
@@ -47,11 +64,12 @@ namespace Server
                 stream.Read(buffer, 0, buffer.Length);
 
                 Console.WriteLine(BytesToObj(buffer).message);
-            }
+            }*/
         }
 
 
         private void DiscoveryListener() {
+            /*
             //Passando 0 usiamo qualsiasi porta scelta dal client
             IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any,0);
 
@@ -64,7 +82,8 @@ namespace Server
             //Se la stringa di richiesta è giusta rispondiamo con la stringa di risposta
             if (clientRequestMessage.Equals(listenerRequestCheck)) {
                 serverListener.Send(listenerResponseData, listenerResponseData.Length, clientEndPoint);
-            }
+            }*/
+
         }
 
         /// <summary>
