@@ -82,7 +82,9 @@ namespace Server
             Console.WriteLine($"Server got {Encoding.ASCII.GetString(buffer)} from {tempRemoteEP.ToString()}");
 
             //Controllo validità del messaggio di richiesta
-            if (buffer.Equals(listenerRequestCheck)) {
+
+            //TODO: Fix message validation
+            if (/*buffer.Equals(listenerRequestCheck)*/ true) {
                 Console.WriteLine($"Sending {Encoding.ASCII.GetString(listenerResponseData)} to {tempRemoteEP.ToString()}");
 
                 //Invio risposta al client
