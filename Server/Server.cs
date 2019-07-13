@@ -4,17 +4,25 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using irc;
+using System.Text;
 
 namespace Server
 {
     class Server
     {
+        private UdpClient serverListener;
+        private static byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_RESPONSE");
+        private static string listenerRequestCheck = "DISCOVER_IRCSERVER_REQUEST";
+
         public Server()
         {
             int port = 7777;
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             TcpListener server = new TcpListener (ip, port);
             TcpClient client = default(TcpClient);
+
+            serverListener = new UdpClient(port);
+            
 
             try
             {
@@ -29,6 +37,8 @@ namespace Server
 
             while (true)
             {
+                DiscoveryListener();
+
                 client = server.AcceptTcpClient();
 
                 byte[] buffer = new byte[1024];
@@ -37,6 +47,23 @@ namespace Server
                 stream.Read(buffer, 0, buffer.Length);
 
                 Console.WriteLine(BytesToObj(buffer).message);
+            }
+        }
+
+
+        private void DiscoveryListener() {
+            //Passando 0 usiamo qualsiasi porta scelta dal client
+            IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any,0);
+
+            //Riceviamo i dati dal client e trasformiamo in stringa
+            byte[] clientRequestData = serverListener.Receive(ref clientEndPoint);
+            string clientRequestMessage = Encoding.ASCII.GetString(clientRequestData);
+
+            Console.WriteLine($"Received {clientRequestMessage} from {clientEndPoint.Address.ToString()}");
+
+            //Se la stringa di richiesta è giusta rispondiamo con la stringa di risposta
+            if (clientRequestMessage.Equals(listenerRequestCheck)) {
+                serverListener.Send(listenerResponseData, listenerResponseData.Length, clientEndPoint);
             }
         }
 
