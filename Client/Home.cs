@@ -25,6 +25,8 @@ namespace Client
             //current_user = myCurrent_user;
             //online_users = myOnline_users;
 
+            DiscoverServers();
+
             current_user = new ircUser(0, "Dax");
             online_users = new List<ircUser> {
                 new ircUser(1, "Loca"),
