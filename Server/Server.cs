@@ -5,6 +5,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using irc;
 using System.Text;
+using System.Collections.Generic;
+using System.Data;
+using System.Web.Helpers;
 
 namespace Server
 {
@@ -24,6 +27,9 @@ namespace Server
         //Creo nuovo socket UDP su cui ascoltare le richieste dei client
         Socket serverListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
+        //Lista di utenti online sul server
+        List<ircUser> onlineUsers;
+
         public Server()
         {
             //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
@@ -34,6 +40,10 @@ namespace Server
             Console.WriteLine("Server listening...");
             TcpListener server = new TcpListener (ip, port);
             //TcpClient client = default(TcpClient);
+
+            onlineUsers = new List<ircUser>();
+
+            Login(username, password, IPAddress.Loopback);
 
             try
             {
@@ -62,7 +72,7 @@ namespace Server
                 Console.WriteLine(ircMessage.BytesToObj(buffer).message);
             }
         }
-
+        #region discoveryListener
         /// <summary>
         ///     Server discovery listener usato per rispondere alle richieste UDP broadcast dei client.
         /// </summary>
@@ -83,8 +93,6 @@ namespace Server
             Console.WriteLine($"Server got {Encoding.ASCII.GetString(buffer)} from {tempRemoteEP.ToString()}");
 
             //Controllo validità del messaggio di richiesta
-
-            //TODO: Fix message validation
             if (Encoding.ASCII.GetString(buffer).Equals(Encoding.ASCII.GetString(listenerRequestCheck))) {
                 Console.WriteLine($"Sending {Encoding.ASCII.GetString(listenerResponseData)} to {tempRemoteEP.ToString()}");
 
@@ -94,5 +102,78 @@ namespace Server
                 Console.WriteLine($"Bad message from {tempRemoteEP.ToString()} not replying...");
             }
         }
-    }    
+        #endregion
+
+        #region userAuth
+
+        private List<ircUser> Login(string username, string password, IPAddress address) {
+
+            Console.WriteLine($"Inizio processo di login per {username}");
+
+            DBManager dbManager = new DBManager();
+
+            DataTable result = dbManager.Query(TableNames.usersTable, $"SELECT * FROM {TableNames.usersTable} WHERE username = '{username}'");
+            
+            if (result.Rows.Count != 1) {
+                Console.WriteLine("Login fallito!");
+                return null;
+            } else {
+                if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
+                    onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
+                } else {
+                    Console.WriteLine("Login fallito!");
+                    return null;
+                }
+            }
+
+            return this.onlineUsers;
+        }
+
+        //TODO: Add password repeat control on Client
+        private void Register(string username, string password) {
+            Console.WriteLine($"Inizio processo di registrazione per {username}");
+            DBManager dbManager = new DBManager();
+
+            dbManager.Insert(TableNames.usersTable, new Dictionary<string, string> {
+                {"username", username},
+                {"password", Crypto.HashPassword(password)}
+            });
+        }
+
+        #endregion
+
+        #region messageConversion
+
+        /// <summary>
+        ///  Converte un Oggetto qualsiasi in un array di byte
+        /// </summary>
+        /// <param msg="obj Message da convertire">
+        /// </param>
+        private byte[] ObjToBytes(ircMessage msg)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, msg);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        ///  Converte un array di byte 
+        /// </summary>
+        /// <param msg="array di byte da convertire">
+        /// </param>
+        private ircMessage BytesToObj(byte[] msg)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                ms.Write(msg, 0, msg.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                return (ircMessage)bf.Deserialize(ms);
+            }
+        }
+        #endregion
+    }
 }
