@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe.config
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.pdb
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.exe
+C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.pdb
+=======
 C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.exe.config
 C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.exe
 C:\Users\Locas\Desktop\IRC\Server\bin\Debug\Server.pdb
@@ -128,6 +136,7 @@ C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\bin\Debug\System.Xml.XPath.XDocumen
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\bin\Debug\IRC.dll
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\bin\Debug\IRC.pdb
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.exe.config
+<<<<<<< HEAD
 D:\Users\Gabriele\source\repos\IRC\Server\bin\Debug\Microsoft.Win32.Primitives.dll
 D:\Users\Gabriele\source\repos\IRC\Server\bin\Debug\netstandard.dll
 D:\Users\Gabriele\source\repos\IRC\Server\bin\Debug\System.AppContext.dll
@@ -337,3 +346,6 @@ C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CoreCompileInp
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.exe
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.pdb
+=======
+>>>>>>> develop
+>>>>>>> develop
