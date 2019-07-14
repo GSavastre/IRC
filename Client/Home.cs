@@ -105,8 +105,6 @@ namespace Client
             return serverIp;
         }
 
-
-
         
         void LoadContacts(List<ircUser> users) {
             foreach (ircUser user in online_users) {
