@@ -42,7 +42,9 @@ namespace Client {
 
             //Prendo gli indirizzi di tutte le interfacce di questo pc
             string hostname = Dns.GetHostName();
+            #pragma warning disable CS0618 // Type or member is obsolete
             IPHostEntry allLocalNetworkAddresses = Dns.Resolve(hostname);
+            #pragma warning restore CS0618 // Type or member is obsolete
 
             while (true) {
                 //Attraverso tutte le interfacce
@@ -90,8 +92,8 @@ namespace Client {
                             SetText(serverIP);
                         }
 
-                    } catch (Exception e) {
-                       // MessageBox.Show(e.Message);
+                    } catch {
+                       //MessageBox.Show(e.Message);
                     }
                 }
             }
@@ -114,7 +116,7 @@ namespace Client {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
                 discoveryThread.Abort();
-                new Home(/*selectedServerIp*/).Show();
+                new Home(selectedServerIp).Show();
             }
         }
 

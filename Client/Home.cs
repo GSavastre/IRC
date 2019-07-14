@@ -31,11 +31,11 @@ namespace Client
             //current_user = myCurrent_user;
             //online_users = myOnline_users;
 
-           /* current_user = new ircUser(0, "Dax");
-            online_users = new List<ircUser> {
-                new ircUser(1, "Loca"),
-                new ircUser(2, "Sava")
-            };*/
+           current_user = new ircUser(0, "Dax", "192.168.0.107");
+           online_users = new List<ircUser> {
+                new ircUser(1, "Loca", ""),
+                new ircUser(2, "Sava", "")
+            };
 
             l_user.Text = current_user.username;
 
@@ -100,7 +100,7 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            ircUser partner = new ircUser( ((ircUser)partner_button.Tag).id, ((ircUser)partner_button.Tag).username);
+            ircUser partner = new ircUser(((ircUser)partner_button.Tag).id, ((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
             Form chat = new Chat(partner, server_addr);
             chat.Show();
         }
