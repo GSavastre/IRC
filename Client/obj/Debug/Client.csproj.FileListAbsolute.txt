@@ -334,3 +334,4 @@ C:\Users\Gabriele\source\repos\IRC\Client\obj\Debug\Client.csproj.CoreCompileInp
 C:\Users\Gabriele\source\repos\IRC\Client\obj\Debug\Client.csproj.CopyComplete
 C:\Users\Gabriele\source\repos\IRC\Client\obj\Debug\Client.exe
 C:\Users\Gabriele\source\repos\IRC\Client\obj\Debug\Client.pdb
+C:\Users\Gabriele\source\repos\IRC\Client\obj\Debug\Client.ServerSearch.resources

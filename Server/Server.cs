@@ -43,8 +43,6 @@ namespace Server
 
             onlineUsers = new List<ircUser>();
 
-            Login(username, password, IPAddress.Loopback);
-
             try
             {
                 server.Start();

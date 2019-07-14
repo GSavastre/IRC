@@ -33,7 +33,7 @@ namespace Client
                     loop = false;
             }
             */
-            Application.Run(new Home());
+            Application.Run(new ServerSearch());
         }
     }
 }
