@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using irc;
 
 namespace Server
 {
@@ -33,21 +32,43 @@ namespace Server
                 Console.WriteLine("Waiting...");
                 client = server.AcceptTcpClient();
 
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[1024];
                 NetworkStream stream = client.GetStream();
 
                 stream.Read(buffer, 0, buffer.Length);
 
-                StringBuilder msg = new StringBuilder();
+                Console.WriteLine(BytesToObj(buffer).message);
+            }
+        }
 
-                foreach(byte b in buffer)
-                {
-                    if (b.Equals(00))
-                        break;
-                    else
-                        msg.Append(Convert.ToChar(b).ToString());
-                }
-                Console.WriteLine(msg);
+        /// <summary>
+        ///  Converte un Oggetto qualsiasi in un array di byte
+        /// </summary>
+        /// <param msg="obj Message da convertire">
+        /// </param>
+        private byte[] ObjToBytes(ircMessage msg)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, msg);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        ///  Converte un array di byte 
+        /// </summary>
+        /// <param msg="array di byte da convertire">
+        /// </param>
+        private ircMessage BytesToObj(byte[] msg)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                ms.Write(msg, 0, msg.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                return (ircMessage)bf.Deserialize(ms);
             }
         }
     }
