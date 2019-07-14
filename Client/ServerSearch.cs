@@ -116,7 +116,7 @@ namespace Client {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
                 discoveryThread.Abort();
-                new Home(selectedServerIp).Show();
+                new Login(selectedServerIp).Show();
             }
         }
 

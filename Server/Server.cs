@@ -104,7 +104,7 @@ namespace Server
 
         #region userAuth
 
-        private List<ircUser> Login(string username, string password, IPAddress address) {
+        private List<ircUser> Login(string username, string password, string address) {
 
             Console.WriteLine($"Inizio processo di login per {username}");
 

@@ -17,7 +17,7 @@ namespace Client
         int server_port = 7777;
         TcpClient client;
 
-        public Login()
+        public Login(string myServer_addr)
         {
             InitializeComponent();
             this.DialogResult = DialogResult.OK; ;
