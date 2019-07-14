@@ -34,7 +34,7 @@ namespace Client
                     loop = false;
             }
             */
-            Application.Run(new Home("192.168.0.107"));
+            Application.Run(new ServerSearch());
         }
     }
 }

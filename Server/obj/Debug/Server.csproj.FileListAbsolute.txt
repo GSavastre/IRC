@@ -222,4 +222,8 @@ C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CoreCompileInp
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.exe
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.pdb
+<<<<<<< HEAD
 >>>>>>> develop
+=======
+C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache
+>>>>>>> ClientLoginServerDiscovery
