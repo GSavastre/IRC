@@ -38,11 +38,11 @@ namespace Server
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             Console.WriteLine("Server listening...");
             TcpListener server = new TcpListener (ip, port);
-            //TcpClient client = default(TcpClient);
+            TcpClient client = default(TcpClient);
 
             onlineUsers = new List<ircUser>();
 
-            /*try
+            try
             {
                 server.Start();
                 Console.WriteLine("Server started...");
@@ -51,22 +51,11 @@ namespace Server
             {
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
-            }*/
+            }
 
-            //while (true)
-            //{
-
-                /*var serverListener = new UdpClient(7778);
-                var clientEp = new IPEndPoint(IPAddress.Any, 0);
-                var clientRequestData = serverListener.Receive(ref clientEp);
-                var clientRequest = Encoding.ASCII.GetString(clientRequestData);
-
-                Console.WriteLine($"Received {clientRequest} from {clientEp.Address}, sending response: { listenerResponseData}");
-                serverListener.Send(listenerResponseData, listenerResponseData.Length, clientEp);
-                serverListener.Close();*/
-                /*
-
-                TcpClient client = default(TcpClient);
+            while (true)
+            {
+                //TcpClient client = default(TcpClient);
                 client = server.AcceptTcpClient();
 
                 byte[] buffer = new byte[1024];
@@ -74,8 +63,8 @@ namespace Server
 
                 stream.Read(buffer, 0, buffer.Length);
 
-                Console.WriteLine(ircMessage.BytesToObj(buffer).message);*/
-            //}
+                Console.WriteLine(ircMessage.BytesToObj(buffer).message);
+            }
         }
         #region discoveryListener
         /// <summary>
