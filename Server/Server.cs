@@ -29,16 +29,25 @@ namespace Server
 
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
+        Thread tcpListnerThread = null;
 
         public Server()
         {
+<<<<<<< HEAD
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
             discoveryListener.Start();
+=======
+            //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
+            //Usando port indico alla socket che deve ascoltare su quella specifica porta
+            serverListener.Bind(new IPEndPoint(IPAddress.Any, discoveryPort));
+>>>>>>> ServerSwitchImplementation
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
-            Console.WriteLine("Server listening...");
             TcpListener server = new TcpListener (ip, port);
+<<<<<<< HEAD
             TcpClient client = default(TcpClient);
+=======
+>>>>>>> ServerSwitchImplementation
 
             onlineUsers = new List<ircUser>();
 
@@ -52,9 +61,10 @@ namespace Server
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
             }
-
-            while (true)
+            
+            tcpListnerThread = new Thread(() =>
             {
+<<<<<<< HEAD
                 //TcpClient client = default(TcpClient);
                 client = server.AcceptTcpClient();
 
@@ -67,22 +77,49 @@ namespace Server
 
                 ircMessage myMessage = ircMessage.BytesToObj(buffer);
                 switch (myMessage.action)
+=======
+                while (true)
+>>>>>>> ServerSwitchImplementation
                 {
-                    case 0: //Registrazione
-                        Console.WriteLine("Register case");
-                        break;
-                    case 1: //Login
-                        Console.WriteLine("Login case");
-                        break;
-                    case 2: //Message
-                        Console.WriteLine("Message case");
-                        break;
-                    case 3: //Logout
-                        Console.WriteLine("Logout case");
-                        break;
+                    //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
+                    DiscoveryListener();
+
+                    TcpClient client = default(TcpClient);
+                    client = server.AcceptTcpClient();
+                    Console.WriteLine(client.ToString());
+                
+                    byte[] buffer = new byte[1024];
+                    NetworkStream stream = client.GetStream();
+
+                    stream.Read(buffer, 0, buffer.Length);
+
+                    Console.WriteLine(ircMessage.BytesToObj(buffer).message);
+
+                    ircMessage msg = ircMessage.BytesToObj(buffer);
+                    switch (msg.action)
+                    {
+                        case 0:                                                             //Registrazione nuovo utente
+                            Console.WriteLine("REGISTER_USER_REQUEST Received");
+                            Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
+                            break;
+
+                        case 1: //Login
+                            Console.WriteLine("LOGIN_USER_REQUEST Received");
+                            //Login() to fix, no need to pass user pwd
+                            break;
+                        case 2: //Message
+                            Console.WriteLine("MESSAGE Received");
+                            break;
+                        case 3: //Logout
+                            Console.WriteLine("Logout case");
+                            break;
+                    }
                 }
-            }
+            });
+
+            tcpListnerThread.Start();
         }
+
         #region discoveryListener
         /// <summary>
         ///     Server discovery listener usato per rispondere alle richieste UDP broadcast dei client.
@@ -155,8 +192,7 @@ namespace Server
 
             return this.onlineUsers;
         }
-
-        //TODO: Add password repeat control on Client
+        
         private void Register(string username, string password) {
             Console.WriteLine($"Inizio processo di registrazione per {username}");
             DBManager dbManager = new DBManager();
@@ -169,38 +205,9 @@ namespace Server
 
         #endregion
 
-        #region messageConversion
-
-        /// <summary>
-        ///  Converte un Oggetto qualsiasi in un array di byte
-        /// </summary>
-        /// <param msg="obj Message da convertire">
-        /// </param>
-        private byte[] ObjToBytes(ircMessage msg)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, msg);
-                return ms.ToArray();
-            }
+        void RedirectData() {
+            //TODO 
         }
-
-        /// <summary>
-        ///  Converte un array di byte 
-        /// </summary>
-        /// <param msg="array di byte da convertire">
-        /// </param>
-        private ircMessage BytesToObj(byte[] msg)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                BinaryFormatter bf = new BinaryFormatter();
-                ms.Write(msg, 0, msg.Length);
-                ms.Seek(0, SeekOrigin.Begin);
-                return (ircMessage)bf.Deserialize(ms);
-            }
-        }
-        #endregion
+        
     }
 }

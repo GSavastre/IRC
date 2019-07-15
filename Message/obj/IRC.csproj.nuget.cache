@@ -1,9 +1,13 @@
 {
   "version": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
   "dgSpecHash": "79i1vveMzVL6gnuyiojorC6J0UGXWWup9DsHfRhLNjanRp/1WL25kFFVnG6jN4Yk5ZPIZowjDOadtm5oR1Xfhg==",
 =======
   "dgSpecHash": "iUfeaO5OOlO1wklvwEXqhjWnAnUKQbZz6DmNqUOEhNyLjyFjc84+IfPDQ2wEHzJoyvpIiK37lVcwadJ3NADupA==",
 >>>>>>> develop
+=======
+  "dgSpecHash": "N+5EHNae51nhtodPQmf/uQAuhadx3EiPLykJ8rhsME+l3LGmKb9q+fvJCcmgjRfcRxzYapLAK2THasVvH81TqQ==",
+>>>>>>> ServerSwitchImplementation
   "success": true
 }

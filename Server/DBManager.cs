@@ -198,6 +198,7 @@ namespace Server {
 
             this.CloseConnection();
         }
+        
         /// <summary>
         ///  Aggiorna i valori di una riga della tabella in base al parametro passato.
         /// </summary>
