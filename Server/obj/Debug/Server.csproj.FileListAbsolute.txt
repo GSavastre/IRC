@@ -110,3 +110,4 @@ C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csproj.CoreCompile
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.exe
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache

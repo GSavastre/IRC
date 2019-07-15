@@ -36,7 +36,7 @@ namespace Server
 
             try
             {
-                server.Start();
+                //server.Start();
                 Console.WriteLine("Server started...");
             }
             catch (SocketException e)
@@ -81,7 +81,7 @@ namespace Server
                     }
                 }
             });
-            tcpListnerThread.Start();
+            //tcpListnerThread.Start();
         }
 
         #region discoveryListener
