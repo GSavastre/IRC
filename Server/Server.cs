@@ -8,6 +8,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Data;
 using System.Web.Helpers;
+using System.Threading;
 
 namespace Server
 {
@@ -29,6 +30,9 @@ namespace Server
 
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
+
+        //Thread di ascolto
+        Thread tcpListenerThread = null;
 
         public Server()
         {
@@ -52,7 +56,9 @@ namespace Server
                 Console.Read();
             }
 
-            while (true)
+            StartTcpListnerThread();
+
+            /*while (true)
             {
                 //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
                 DiscoveryListener();
@@ -77,7 +83,7 @@ namespace Server
 
                     case 1: //Login
                         Console.WriteLine("LOGIN_USER_REQUEST Received");
-                        //Login()
+                        //Login() to fix, no need to pass user pwd
                         break;
                     case 2: //Message
                         Console.WriteLine("MESSAGE Received");
@@ -86,8 +92,9 @@ namespace Server
                         Console.WriteLine("Logout case");
                         break;
                 }
-            }
+            }*/
         }
+
         #region discoveryListener
         /// <summary>
         ///     Server discovery listener usato per rispondere alle richieste UDP broadcast dei client.
@@ -157,38 +164,55 @@ namespace Server
 
         #endregion
 
-        #region messageConversion
-
-        /// <summary>
-        ///  Converte un Oggetto qualsiasi in un array di byte
-        /// </summary>
-        /// <param msg="obj Message da convertire">
-        /// </param>
-        private byte[] ObjToBytes(ircMessage msg)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
+        void StartTcpListnerThread() {
+            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            TcpClient client;
+            listener.Start();
+            tcpListenerThread = new Thread(() =>
             {
-                bf.Serialize(ms, msg);
-                return ms.ToArray();
-            }
+                tcpListenerThread.IsBackground = true;
+                while (true)
+                {
+                    //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
+                    DiscoveryListener();
+
+                    client = default(TcpClient);
+                    client = listener.AcceptTcpClient();
+
+                    byte[] buffer = new byte[1024];
+                    NetworkStream stream = client.GetStream();
+
+                    stream.Read(buffer, 0, buffer.Length);
+
+                    Console.WriteLine(ircMessage.BytesToObj(buffer).message);
+
+                    ircMessage msg = ircMessage.BytesToObj(buffer);
+                    switch (msg.action)
+                    {
+                        case 0:                                                             //Registrazione nuovo utente
+                            Console.WriteLine("REGISTER_USER_REQUEST Received");
+                            Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
+                            break;
+
+                        case 1: //Login
+                            Console.WriteLine("LOGIN_USER_REQUEST Received");
+                            //Login() to fix, no need to pass user pwd
+                            break;
+                        case 2: //Message
+                            Console.WriteLine("MESSAGE Received");
+                            break;
+                        case 3: //Logout
+                            Console.WriteLine("Logout case");
+                            break;
+                    }
+                }
+            });
+            tcpListenerThread.Start();
         }
 
-        /// <summary>
-        ///  Converte un array di byte 
-        /// </summary>
-        /// <param msg="array di byte da convertire">
-        /// </param>
-        private ircMessage BytesToObj(byte[] msg)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                BinaryFormatter bf = new BinaryFormatter();
-                ms.Write(msg, 0, msg.Length);
-                ms.Seek(0, SeekOrigin.Begin);
-                return (ircMessage)bf.Deserialize(ms);
-            }
+        void RedirectData() {
+            //TODO 
         }
-        #endregion
+        
     }
 }
