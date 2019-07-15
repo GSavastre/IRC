@@ -8,13 +8,15 @@ namespace Client
 {
     public partial class Register : Form
     {
-        string server_addr = "127.0.0.1";
+        string server_addr;
         int server_port = 7777;
         TcpClient client;
 
-        public Register()
+        public Register(string myServer_addr)
         {
             InitializeComponent();
+
+            server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
         }
 
@@ -32,13 +34,21 @@ namespace Client
                     stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
                     stream.Close();
                     client.Close();
+
+                    ///TODO: ASPETTARE ESITO REGISTRAZIONE E POI CREARE UTENTE 
+                    //ircUser curruntUser = new ircUser(id, username, address)
+
+                    Form myHome = new Home(server_addr);
+                    this.Hide();
+                    myHome.Show();
+                    this.Close();
                 }
                 else
                     MessageBox.Show("LE PASSWORD NON COINCIDONO");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
