@@ -2,16 +2,17 @@
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace irc
 {
     [Serializable]
     public class ircMessage
-    {        
-        public string sender_username;
-        public string receiver_username;
-        public string message;
-        public int action;
+    {
+        public string sender_username { get; set; }
+        public string receiver_username { get; set; }
+        public string message { get; set; }
+        public int action { get; set; }
         //public int hashCode; TODO
 
         public ircMessage(string myUsername, string myReceiver_username, string myMessage, int myAction) //costruttore Message
@@ -24,7 +25,7 @@ namespace irc
 
         public ircMessage(string myUsername, string myPassword, int myAction) //costruttore per Registrazione(0) e Login(1)
         {
-            message = myUsername + "~" + myPassword;
+            message = myUsername + ":" + myPassword;
             action = myAction; //azione di invio messaggio
         }
 
@@ -56,6 +57,8 @@ namespace irc
         /// </param>
         public static ircMessage BytesToObj(byte[] msg)
         {
+            //string messaggio = Encoding.ASCII.GetString(msg);
+
             using (MemoryStream ms = new MemoryStream())
             {
                 BinaryFormatter bf = new BinaryFormatter();
@@ -64,7 +67,6 @@ namespace irc
                 return (ircMessage)bf.Deserialize(ms);
             }
         }
-
 
     }
 }
