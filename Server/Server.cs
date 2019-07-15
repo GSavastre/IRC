@@ -37,9 +37,7 @@ namespace Server
             serverListener.Bind(new IPEndPoint(IPAddress.Any,discoveryPort));
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
-            Console.WriteLine("Server listening...");
             TcpListener server = new TcpListener (ip, port);
-            //TcpClient client = default(TcpClient);
 
             onlineUsers = new List<ircUser>();
 
@@ -69,17 +67,20 @@ namespace Server
 
                 Console.WriteLine(ircMessage.BytesToObj(buffer).message);
 
-                ircMessage myMessage = ircMessage.BytesToObj(buffer);
-                switch (myMessage.action)
+                ircMessage msg = ircMessage.BytesToObj(buffer);
+                switch (msg.action)
                 {
-                    case 0: //Registrazione
-                        Console.WriteLine("Register case");
+                    case 0:                                                             //Registrazione nuovo utente
+                        Console.WriteLine("REGISTER_USER_REQUEST Received");
+                        Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
                         break;
+
                     case 1: //Login
-                        Console.WriteLine("Login case");
+                        Console.WriteLine("LOGIN_USER_REQUEST Received");
+                        //Login()
                         break;
                     case 2: //Message
-                        Console.WriteLine("Message case");
+                        Console.WriteLine("MESSAGE Received");
                         break;
                     case 3: //Logout
                         Console.WriteLine("Logout case");
@@ -143,8 +144,7 @@ namespace Server
 
             return this.onlineUsers;
         }
-
-        //TODO: Add password repeat control on Client
+        
         private void Register(string username, string password) {
             Console.WriteLine($"Inizio processo di registrazione per {username}");
             DBManager dbManager = new DBManager();
