@@ -51,39 +51,51 @@ namespace Client
         /// </param>
         void LoadContacts(List<ircUser> users) {
             foreach (ircUser user in online_users) {
-                Panel panel = new Panel();
-                panel.Size = new Size(252, 48);
+                Panel panel = new Panel
+                {
+                    Size = new Size(252, 48)
+                };
 
-                Label label_user = new Label();
-                label_user.Text = user.username;
-                label_user.Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular);
-                label_user.Location = new Point(10, 10);
-                label_user.Size = new Size(70, 16);
+                Label label_user = new Label
+                {
+                    Text = user.username,
+                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                    Location = new Point(10, 10),
+                    Size = new Size(70, 16)
+                };
 
-                Button btn = new Button();
-                btn.Size = new Size(75, 34);
-                btn.Tag = user;
-                btn.Text = "Start Chat";
-                btn.Location = new Point(165, 7);
+                Button btn = new Button
+                {
+                    Size = new Size(75, 34),
+                    Tag = user,
+                    Text = "Start Chat",
+                    Location = new Point(165, 7)
+                };
                 btn.Click += new EventHandler(startChat_Button_Click);
 
-                Button btn_status = new Button();
-                btn_status.Size = new Size(15, 15);
-                btn_status.Location = new Point(12, 28);
-                btn_status.BackColor = Color.LimeGreen;
+                Button btn_status = new Button
+                {
+                    Size = new Size(15, 15),
+                    Location = new Point(12, 28),
+                    BackColor = Color.LimeGreen
+                };
 
-                Label label_online = new Label();
-                label_online.Text = "Online";
-                label_online.Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic);
-                label_online.Location = new Point(33, 30);
-                label_online.Size = new Size(37, 13);
+                Label label_online = new Label
+                {
+                    Text = "Online",
+                    Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic),
+                    Location = new Point(33, 30),
+                    Size = new Size(37, 13)
+                };
 
-                Label sep = new Label();
-                sep.AutoSize = false;
-                sep.Height = 2;
-                sep.Width = 250;
-                sep.BorderStyle = BorderStyle.Fixed3D;
-                
+                Label sep = new Label
+                {
+                    AutoSize = false,
+                    Height = 2,
+                    Width = 250,
+                    BorderStyle = BorderStyle.Fixed3D
+                };
+
                 panel.Controls.Add(label_user);
                 panel.Controls.Add(btn);
                 panel.Controls.Add(btn_status);
@@ -112,6 +124,7 @@ namespace Client
             listener.Start();
             tcpListenerThread = new Thread(() =>
             {
+                tcpListenerThread.IsBackground = true;
                 while (true)
                 {
                     try
@@ -137,6 +150,35 @@ namespace Client
                 }
             });
             tcpListenerThread.Start();
+        }
+
+        private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TcpClient client = null;
+            NetworkStream stream = null;
+            try
+            {
+                client = new TcpClient(server_addr, port);
+
+                ircMessage msg_logout = new ircMessage(current_user.username, 2);
+                stream = client.GetStream();
+                stream.Write(ircMessage.ObjToBytes(msg_logout), 0, ircMessage.ObjToBytes(msg_logout).Length);
+
+                stream.Close();
+                client.Close();
+                this.Close();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                stream.Close();
+                client.Close();
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

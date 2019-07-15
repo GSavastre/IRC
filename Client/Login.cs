@@ -8,40 +8,54 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
+using irc;
 
 namespace Client
 {
     public partial class Login : Form
     {
-        string server_addr = "127.0.0.1";
+        string server_addr;
         int server_port = 7777;
         TcpClient client;
 
         public Login(string myServer_addr)
-        {
+        {          
             InitializeComponent();
+            server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK; ;
         }
 
         private void btn_login_Click(object sender, EventArgs e)
         {
-            client = new TcpClient(server_addr, server_port);
+            try
+            {
+                client = new TcpClient(server_addr, server_port);
 
-            Message regMessage = new Message(tb_log_username.Text, tb_log_password.Text, 0); //oggetto messagge per registrazione action = 0
+                ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
-            int msgLenght = Encoding.ASCII.GetByteCount(tb_log_password.Text);  //lunghezza in byte del messaggio
-            byte[] msg_data = new byte[msgLenght];                      //inzializzo array con dim = lunghezza del messaggio
-            msg_data = Encoding.ASCII.GetBytes(tb_log_password.Text);           //inserisco nell array il messaggio in byte
+                NetworkStream stream = client.GetStream();
+                stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
 
-            NetworkStream stream = client.GetStream();
-            stream.Write(msg_data, 0, msgLenght);
-            stream.Close();
-            client.Close();
+                stream.Close();
+                client.Close();
+
+                ///TODO: ASPETTARE ESITO LOGIN E POI CREARE UTENTE 
+                //ircUser curruntUser = new ircUser(id, username, address)
+
+                Form myHome = new Home(server_addr);
+                this.Hide();
+                myHome.ShowDialog();
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void btn_switch_reg_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Yes;
+            this.DialogResult = DialogResult.Yes; //messaggio che ritorna la finestra dialogo se si vuole fare switch
             this.Close();
         }
     }

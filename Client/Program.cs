@@ -17,24 +17,10 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            /*
-            Form loginForm = new Login();
-            Form regForm = new Register();
 
-            bool loop = true;
-            while (loop)
-            {
-                if (loginForm.ShowDialog() == DialogResult.Yes) {
-
-                    if (regForm.ShowDialog() == DialogResult.Yes) { }
-                    else
-                        loop = false;
-                }
-                else
-                    loop = false;
-            }
-            */
             Application.Run(new ServerSearch());
+            //Application.Run(new Register());
+            //Application.Run(new Login("127.0.0.1"));
         }
     }
 }
