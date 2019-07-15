@@ -17,9 +17,9 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-           
-            Application.Run(new ServerSearch());
 
+            Application.Run(new ServerSearch());
+            //Application.Run(new Register());
         }
     }
 }

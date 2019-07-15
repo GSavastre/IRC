@@ -20,15 +20,26 @@ namespace Client
 
         private void btn_register_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (tb_password_repeat.Text == tb_password.Text)
+                {
+                    client = new TcpClient(server_addr, server_port);
 
-            client = new TcpClient(server_addr, server_port);
+                    ircMessage regMessage = new ircMessage(tb_username.Text, tb_password.Text, 0); //oggetto messagge per registrazione action = 0
 
-            ircMessage regMessage = new ircMessage(tb_username.Text, tb_password.Text, 0); //oggetto messagge per registrazione action = 0
-
-            NetworkStream stream = client.GetStream();
-            stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
-            stream.Close();
-            client.Close();  
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
+                    stream.Close();
+                    client.Close();
+                }
+                else
+                    MessageBox.Show("LE PASSWORD NON COINCIDONO");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private void btn_switch_login_Click(object sender, EventArgs e)
