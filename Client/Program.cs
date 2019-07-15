@@ -20,6 +20,7 @@ namespace Client
 
             Application.Run(new ServerSearch());
             //Application.Run(new Register());
+            //Application.Run(new Login("127.0.0.1"));
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Client {
 
         #region ServerDiscovery
         void DiscoverServers() {
-            //La porta su cui il server ascolterà le richieste di discovery
+            //La porta su cui il server ascolterà le richieste di discovery, cambio porta petchè tco non ammette broadcast
             const int port = 7778;
 
             //Messaggio di discovery
@@ -102,9 +102,11 @@ namespace Client {
 
         public ServerSearch() {
             InitializeComponent();
-            
-            discoveryThread = new Thread(new ThreadStart(DiscoverServers));
-            discoveryThread.IsBackground = true; //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
+
+            discoveryThread = new Thread(new ThreadStart(DiscoverServers))
+            {
+                IsBackground = true //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
+            };
 
             discoveryThread.Start();
         }
@@ -117,12 +119,11 @@ namespace Client {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
 
-                Console.WriteLine(discoveryThread.ThreadState);
-                discoveryThread.Suspend();
-                Console.WriteLine(discoveryThread.ThreadState);
+                discoveryThread.Suspend(); //sospendiamo il thread
+
                 this.Hide();
                 Form loginForm = new Login(selectedServerIp);
-                Form regForm = new Register();
+                Form regForm = new Register(selectedServerIp);
 
                 bool loop = true;
                 while (loop)
@@ -138,7 +139,7 @@ namespace Client {
                         loop = false;
                 }
 
-                discoveryThread.Resume();
+                discoveryThread.Resume();   //riattiviamo il thread se torniamo qui
                 this.Show();
             }
         }

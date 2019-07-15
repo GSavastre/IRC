@@ -37,7 +37,7 @@ namespace Client
 
             lb_chat.Items.Add(msg.message);
 
-            tb_msg.Text = "";
+            tb_msg.Text = ""; //Ripulisce casella di scrittura del form
             stream.Close();
             client.Close();
         }
