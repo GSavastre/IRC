@@ -17,17 +17,19 @@ namespace Client {
 
         Thread discoveryThread;
 
-        delegate void SetTextCallback(string text);
+        delegate void AddToListCallback(string text);
 
-        private void SetText(string text) {
+        private void AddToList(string text) {
             // InvokeRequired required compares the thread ID of the
             // calling thread to the thread ID of the creating thread.
             // If these threads are different, it returns true.
             if (this.lbServer.InvokeRequired) {
-                SetTextCallback d = new SetTextCallback(SetText);
+                AddToListCallback d = new AddToListCallback(AddToList);
                 this.Invoke(d, new object[] { text });
             } else {
-                this.lbServer.Items.Add(text);
+                if (!lbServer.Items.Contains(text)) {
+                    this.lbServer.Items.Add(text);
+                }
             }
         }
 
@@ -89,7 +91,7 @@ namespace Client {
                         if (response.Equals(Encoding.ASCII.GetString(replyDataConf))) {
                             //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
                             string serverIP = tempRemoteEP.ToString().Split(':').ToArray()[0];
-                            SetText(serverIP);
+                            AddToList(serverIP);
                         }
 
                     } catch {

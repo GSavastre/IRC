@@ -8,33 +8,32 @@ using System.Text;
 using System.Collections.Generic;
 using System.Data;
 using System.Web.Helpers;
+using System.Threading;
 
 namespace Server
 {
     class Server
     {
-        //Messaggio di risposta alla server discovery request
+        /*//Messaggio di risposta alla server discovery request
         private static byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_ACK");
 
         //Il messaggio di richiesta dovrà corrispondere a questa stringa
-        private static byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
+        private static byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");*/
 
         //Porta su cui il server gestirà le comunicazioni discovery
         private const int discoveryPort = 7778;
 
         private const int port = 7777;
 
-        //Creo nuovo socket UDP su cui ascoltare le richieste dei client
-        Socket serverListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        
 
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
 
         public Server()
         {
-            //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
-            //Usando port indico alla socket che deve ascoltare su quella specifica porta
-            serverListener.Bind(new IPEndPoint(IPAddress.Any,discoveryPort));
+            Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
+            discoveryListener.Start();
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             Console.WriteLine("Server listening...");
@@ -43,7 +42,7 @@ namespace Server
 
             onlineUsers = new List<ircUser>();
 
-            try
+            /*try
             {
                 server.Start();
                 Console.WriteLine("Server started...");
@@ -52,12 +51,20 @@ namespace Server
             {
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
-            }
+            }*/
 
-            while (true)
-            {
-                //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
-                DiscoveryListener();
+            //while (true)
+            //{
+
+                /*var serverListener = new UdpClient(7778);
+                var clientEp = new IPEndPoint(IPAddress.Any, 0);
+                var clientRequestData = serverListener.Receive(ref clientEp);
+                var clientRequest = Encoding.ASCII.GetString(clientRequestData);
+
+                Console.WriteLine($"Received {clientRequest} from {clientEp.Address}, sending response: { listenerResponseData}");
+                serverListener.Send(listenerResponseData, listenerResponseData.Length, clientEp);
+                serverListener.Close();*/
+                /*
 
                 TcpClient client = default(TcpClient);
                 client = server.AcceptTcpClient();
@@ -67,37 +74,53 @@ namespace Server
 
                 stream.Read(buffer, 0, buffer.Length);
 
-                Console.WriteLine(ircMessage.BytesToObj(buffer).message);
-            }
+                Console.WriteLine(ircMessage.BytesToObj(buffer).message);*/
+            //}
         }
         #region discoveryListener
         /// <summary>
         ///     Server discovery listener usato per rispondere alle richieste UDP broadcast dei client.
         /// </summary>
         private void DiscoveryListener() {
-            /* Il sender è colui che invia una richiesta discovery
-             * in questo caso sarà un client che può avere un qualsiasi
-             * indirizzo e usare una qualsiasi porta
-             */
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint tempRemoteEP = (EndPoint)sender;
-            
-            //Il messaggio in byte ricevuto dal client
-            byte[] buffer = new byte[listenerRequestCheck.Length];
 
-            //Riceve messaggi da chiunque
-            serverListener.ReceiveFrom(buffer, ref tempRemoteEP);
+            //Messaggio di risposta alla server discovery request
+            byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_ACK");
 
-            Console.WriteLine($"Server got {Encoding.ASCII.GetString(buffer)} from {tempRemoteEP.ToString()}");
+            //Il messaggio di richiesta dovrà corrispondere a questa stringa
+            byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
 
-            //Controllo validità del messaggio di richiesta
-            if (Encoding.ASCII.GetString(buffer).Equals(Encoding.ASCII.GetString(listenerRequestCheck))) {
-                Console.WriteLine($"Sending {Encoding.ASCII.GetString(listenerResponseData)} to {tempRemoteEP.ToString()}");
+            //Creo nuovo socket UDP su cui ascoltare le richieste dei client
+            Socket serverListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-                //Invio risposta al client
-                serverListener.SendTo(listenerResponseData, tempRemoteEP);
-            } else {
-                Console.WriteLine($"Bad message from {tempRemoteEP.ToString()} not replying...");
+            //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
+            //Usando port indico alla socket che deve ascoltare su quella specifica porta
+            serverListener.Bind(new IPEndPoint(IPAddress.Any, discoveryPort));
+
+            while (true) {
+                /* Il sender è colui che invia una richiesta discovery
+                 * in questo caso sarà un client che può avere un qualsiasi
+                 * indirizzo e usare una qualsiasi porta
+                 */
+                IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
+                EndPoint tempRemoteEP = (EndPoint)sender;
+
+                //Il messaggio in byte ricevuto dal client
+                byte[] buffer = new byte[listenerRequestCheck.Length];
+
+                //Riceve messaggi da chiunque
+                serverListener.ReceiveFrom(buffer, ref tempRemoteEP);
+
+                Console.WriteLine($"Server got {Encoding.ASCII.GetString(buffer)} from {tempRemoteEP.ToString()}");
+
+                //Controllo validità del messaggio di richiesta
+                if (Encoding.ASCII.GetString(buffer).Equals(Encoding.ASCII.GetString(listenerRequestCheck))) {
+                    Console.WriteLine($"Sending {Encoding.ASCII.GetString(listenerResponseData)} to {tempRemoteEP.ToString()}");
+
+                    //Invio risposta al client
+                    serverListener.SendTo(listenerResponseData, tempRemoteEP);
+                } else {
+                    Console.WriteLine($"Bad message from {tempRemoteEP.ToString()} not replying...");
+                }
             }
         }
         #endregion
