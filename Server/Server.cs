@@ -3,52 +3,35 @@ using System.Net.Sockets;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using irc;
 using System.Text;
 using System.Collections.Generic;
 using System.Data;
 using System.Web.Helpers;
 using System.Threading;
+using irc;
 
 namespace Server
 {
     class Server
     {
-        /*//Messaggio di risposta alla server discovery request
-        private static byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_ACK");
-
-        //Il messaggio di richiesta dovrà corrispondere a questa stringa
-        private static byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");*/
-
+        
         //Porta su cui il server gestirà le comunicazioni discovery
         private const int discoveryPort = 7778;
 
         private const int port = 7777;
-
         
-
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
         Thread tcpListnerThread = null;
 
         public Server()
         {
-<<<<<<< HEAD
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
             discoveryListener.Start();
-=======
-            //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
-            //Usando port indico alla socket che deve ascoltare su quella specifica porta
-            serverListener.Bind(new IPEndPoint(IPAddress.Any, discoveryPort));
->>>>>>> ServerSwitchImplementation
-
+            
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             TcpListener server = new TcpListener (ip, port);
-<<<<<<< HEAD
-            TcpClient client = default(TcpClient);
-=======
->>>>>>> ServerSwitchImplementation
-
+            
             onlineUsers = new List<ircUser>();
 
             try
@@ -63,37 +46,19 @@ namespace Server
             }
             
             tcpListnerThread = new Thread(() =>
-            {
-<<<<<<< HEAD
-                //TcpClient client = default(TcpClient);
-                client = server.AcceptTcpClient();
-
-                byte[] buffer = new byte[1024];
-                NetworkStream stream = client.GetStream();
-
-                stream.Read(buffer, 0, buffer.Length);
-
-                Console.WriteLine(ircMessage.BytesToObj(buffer).message);
-
-                ircMessage myMessage = ircMessage.BytesToObj(buffer);
-                switch (myMessage.action)
-=======
+            {               
                 while (true)
->>>>>>> ServerSwitchImplementation
                 {
                     //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
                     DiscoveryListener();
 
                     TcpClient client = default(TcpClient);
                     client = server.AcceptTcpClient();
-                    Console.WriteLine(client.ToString());
                 
                     byte[] buffer = new byte[1024];
                     NetworkStream stream = client.GetStream();
 
                     stream.Read(buffer, 0, buffer.Length);
-
-                    Console.WriteLine(ircMessage.BytesToObj(buffer).message);
 
                     ircMessage msg = ircMessage.BytesToObj(buffer);
                     switch (msg.action)
@@ -116,7 +81,6 @@ namespace Server
                     }
                 }
             });
-
             tcpListnerThread.Start();
         }
 
