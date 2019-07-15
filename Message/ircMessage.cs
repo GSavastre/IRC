@@ -1,24 +1,56 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace irc
 {
     [Serializable]
     public class ircMessage
     {
-        public IPAddress ipSender;
-        public int portSender;
+        public string sender_username;
         public string receiver_username;
         public string message;
         //public int hashCode; TODO
 
-        public ircMessage(IPAddress myIpSender, int myPortSender, string myReceiver_username, string myMessage)
+        public ircMessage(string myUsername, string myReceiver_username, string myMessage)
         {
-            ipSender = myIpSender;
-            portSender = myPortSender;
+            sender_username = myUsername;
             receiver_username = myReceiver_username;
             message = myMessage;
         }
+
+        /// <summary>
+        ///  Converte un Oggetto qualsiasi in un array di byte
+        /// </summary>
+        /// <param msg="obj Message da convertire">
+        /// </param>
+        public static byte[] ObjToBytes(ircMessage msg)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, msg);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        ///  Converte un array di byte 
+        /// </summary>
+        /// <param msg="array di byte da convertire">
+        /// </param>
+        public static ircMessage BytesToObj(byte[] msg)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                ms.Write(msg, 0, msg.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                return (ircMessage)bf.Deserialize(ms);
+            }
+        }
+
 
     }
 }

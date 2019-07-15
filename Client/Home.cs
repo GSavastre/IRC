@@ -7,30 +7,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Sockets;
+using System.Net;
 using irc;
+using System.Net.NetworkInformation;
+using System.Threading;
 
 namespace Client
 {
     public partial class Home : Form
     {
-        ircUser current_user;
+        const int port = 7777;
+        string server_addr = "";
+        public static ircUser current_user;
         List<ircUser> online_users;
 
-        public Home(/*ircUser myCurrent_user, List<ircUser> myOnline_users*/)
+        Thread tcpListenerThread = null;
+
+        public Home(string myServer_addr)
         {
             InitializeComponent();
+            server_addr = myServer_addr;
             //current_user = myCurrent_user;
             //online_users = myOnline_users;
 
-            current_user = new ircUser(0, "Dax");
-            online_users = new List<ircUser> {
-                new ircUser(1, "Loca"),
-                new ircUser(2, "Sava")
+           current_user = new ircUser(0, "Dax", "192.168.0.107");
+           online_users = new List<ircUser> {
+                new ircUser(1, "Loca", ""),
+                new ircUser(2, "Sava", "")
             };
 
             l_user.Text = current_user.username;
 
             LoadContacts(online_users);
+            StartTcpListenerThread();
         }
 
         /// <summary>
@@ -55,7 +65,8 @@ namespace Client
                 btn.Tag = user;
                 btn.Text = "Start Chat";
                 btn.Location = new Point(165, 7);
-                
+                btn.Click += new EventHandler(startChat_Button_Click);
+
                 Button btn_status = new Button();
                 btn_status.Size = new Size(15, 15);
                 btn_status.Location = new Point(12, 28);
@@ -81,6 +92,51 @@ namespace Client
                 flp_contacts.Controls.Add(panel);
                 flp_contacts.Controls.Add(sep);
             }
+        }
+
+        /// <summary>
+        ///  Handler dinamico per instanziare nuove chat.
+        /// </summary>
+        private void startChat_Button_Click(object sender, EventArgs e)
+        {
+            Button partner_button = sender as Button;
+            ircUser partner = new ircUser(((ircUser)partner_button.Tag).id, ((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
+            Form chat = new Chat(partner, server_addr);
+            chat.Show();
+        }
+
+        private void StartTcpListenerThread()
+        {
+            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            TcpClient client;
+            listener.Start();
+            tcpListenerThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        client = listener.AcceptTcpClient();
+                        byte[] buffer = new byte[1024];
+                        NetworkStream stream = client.GetStream();
+                        stream.Read(buffer, 0, buffer.Length);
+
+                        ircMessage msg = ircMessage.BytesToObj(buffer);
+                        MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
+                        
+                        /*
+                         * TODO*
+                         * -Controllo da chi arriva il messaggio
+                         * -Mostro messaggio in chat corrispondente
+                         */
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            });
+            tcpListenerThread.Start();
         }
     }
 }
