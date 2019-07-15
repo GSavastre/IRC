@@ -30,15 +30,13 @@ namespace Server
 
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
-
-        //Thread di ascolto
-        Thread tcpListenerThread = null;
+        Thread tcpListnerThread = null;
 
         public Server()
         {
             //Usando IPAddress.any indico alla socket che deve ascoltare per attività su tutte le interfacce di rete
             //Usando port indico alla socket che deve ascoltare su quella specifica porta
-            serverListener.Bind(new IPEndPoint(IPAddress.Any,discoveryPort));
+            serverListener.Bind(new IPEndPoint(IPAddress.Any, discoveryPort));
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             TcpListener server = new TcpListener (ip, port);
@@ -55,44 +53,48 @@ namespace Server
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
             }
-
-            StartTcpListnerThread();
-
-            /*while (true)
+            
+            tcpListnerThread = new Thread(() =>
             {
-                //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
-                DiscoveryListener();
-
-                TcpClient client = default(TcpClient);
-                client = server.AcceptTcpClient();
-
-                byte[] buffer = new byte[1024];
-                NetworkStream stream = client.GetStream();
-
-                stream.Read(buffer, 0, buffer.Length);
-
-                Console.WriteLine(ircMessage.BytesToObj(buffer).message);
-
-                ircMessage msg = ircMessage.BytesToObj(buffer);
-                switch (msg.action)
+                while (true)
                 {
-                    case 0:                                                             //Registrazione nuovo utente
-                        Console.WriteLine("REGISTER_USER_REQUEST Received");
-                        Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
-                        break;
+                    //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
+                    DiscoveryListener();
 
-                    case 1: //Login
-                        Console.WriteLine("LOGIN_USER_REQUEST Received");
-                        //Login() to fix, no need to pass user pwd
-                        break;
-                    case 2: //Message
-                        Console.WriteLine("MESSAGE Received");
-                        break;
-                    case 3: //Logout
-                        Console.WriteLine("Logout case");
-                        break;
+                    TcpClient client = default(TcpClient);
+                    client = server.AcceptTcpClient();
+                    Console.WriteLine(client.ToString());
+                
+                    byte[] buffer = new byte[1024];
+                    NetworkStream stream = client.GetStream();
+
+                    stream.Read(buffer, 0, buffer.Length);
+
+                    Console.WriteLine(ircMessage.BytesToObj(buffer).message);
+
+                    ircMessage msg = ircMessage.BytesToObj(buffer);
+                    switch (msg.action)
+                    {
+                        case 0:                                                             //Registrazione nuovo utente
+                            Console.WriteLine("REGISTER_USER_REQUEST Received");
+                            Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
+                            break;
+
+                        case 1: //Login
+                            Console.WriteLine("LOGIN_USER_REQUEST Received");
+                            //Login() to fix, no need to pass user pwd
+                            break;
+                        case 2: //Message
+                            Console.WriteLine("MESSAGE Received");
+                            break;
+                        case 3: //Logout
+                            Console.WriteLine("Logout case");
+                            break;
+                    }
                 }
-            }*/
+            });
+
+            tcpListnerThread.Start();
         }
 
         #region discoveryListener
@@ -163,52 +165,6 @@ namespace Server
         }
 
         #endregion
-
-        void StartTcpListnerThread() {
-            TcpListener listener = new TcpListener(IPAddress.Any, port);
-            TcpClient client;
-            listener.Start();
-            tcpListenerThread = new Thread(() =>
-            {
-                tcpListenerThread.IsBackground = true;
-                while (true)
-                {
-                    //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
-                    DiscoveryListener();
-
-                    client = default(TcpClient);
-                    client = listener.AcceptTcpClient();
-
-                    byte[] buffer = new byte[1024];
-                    NetworkStream stream = client.GetStream();
-
-                    stream.Read(buffer, 0, buffer.Length);
-
-                    Console.WriteLine(ircMessage.BytesToObj(buffer).message);
-
-                    ircMessage msg = ircMessage.BytesToObj(buffer);
-                    switch (msg.action)
-                    {
-                        case 0:                                                             //Registrazione nuovo utente
-                            Console.WriteLine("REGISTER_USER_REQUEST Received");
-                            Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
-                            break;
-
-                        case 1: //Login
-                            Console.WriteLine("LOGIN_USER_REQUEST Received");
-                            //Login() to fix, no need to pass user pwd
-                            break;
-                        case 2: //Message
-                            Console.WriteLine("MESSAGE Received");
-                            break;
-                        case 3: //Logout
-                            Console.WriteLine("Logout case");
-                            break;
-                    }
-                }
-            });
-            tcpListenerThread.Start();
-        }
 
         void RedirectData() {
             //TODO 
