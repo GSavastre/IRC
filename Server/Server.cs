@@ -68,6 +68,23 @@ namespace Server
                 stream.Read(buffer, 0, buffer.Length);
 
                 Console.WriteLine(ircMessage.BytesToObj(buffer).message);
+
+                ircMessage myMessage = ircMessage.BytesToObj(buffer);
+                switch (myMessage.action)
+                {
+                    case 0: //Registrazione
+                        Console.WriteLine("Register case");
+                        break;
+                    case 1: //Login
+                        Console.WriteLine("Login case");
+                        break;
+                    case 2: //Message
+                        Console.WriteLine("Message case");
+                        break;
+                    case 3: //Logout
+                        Console.WriteLine("Logout case");
+                        break;
+                }
             }
         }
         #region discoveryListener

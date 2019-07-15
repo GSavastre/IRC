@@ -30,7 +30,7 @@ namespace Client
         {
             client = new TcpClient(server_addr, port);
 
-            ircMessage msg = new ircMessage(Home.current_user.username , partner.username , tb_msg.Text);
+            ircMessage msg = new ircMessage(Home.current_user.username , partner.username , tb_msg.Text, 2);
 
             NetworkStream stream = client.GetStream();
             stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);

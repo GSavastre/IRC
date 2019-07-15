@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
+using irc;
 
 namespace Client
 {
@@ -25,16 +26,14 @@ namespace Client
 
         private void btn_login_Click(object sender, EventArgs e)
         {
+
             client = new TcpClient(server_addr, server_port);
 
-            Message regMessage = new Message(tb_log_username.Text, tb_log_password.Text, 0); //oggetto messagge per registrazione action = 0
-
-            int msgLenght = Encoding.ASCII.GetByteCount(tb_log_password.Text);  //lunghezza in byte del messaggio
-            byte[] msg_data = new byte[msgLenght];                      //inzializzo array con dim = lunghezza del messaggio
-            msg_data = Encoding.ASCII.GetBytes(tb_log_password.Text);           //inserisco nell array il messaggio in byte
+            ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
             NetworkStream stream = client.GetStream();
-            stream.Write(msg_data, 0, msgLenght);
+            stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
+
             stream.Close();
             client.Close();
         }

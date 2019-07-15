@@ -104,6 +104,7 @@ namespace Client {
             InitializeComponent();
             
             discoveryThread = new Thread(new ThreadStart(DiscoverServers));
+            discoveryThread.IsBackground = true; //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
 
             discoveryThread.Start();
         }
@@ -115,8 +116,30 @@ namespace Client {
             if (string.IsNullOrEmpty(selectedServerIp)) {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
-                discoveryThread.Abort();
-                new Login(selectedServerIp).Show();
+
+                Console.WriteLine(discoveryThread.ThreadState);
+                discoveryThread.Suspend();
+                Console.WriteLine(discoveryThread.ThreadState);
+                this.Hide();
+                Form loginForm = new Login(selectedServerIp);
+                Form regForm = new Register();
+
+                bool loop = true;
+                while (loop)
+                {
+                    if (loginForm.ShowDialog() == DialogResult.Yes)
+                    {
+
+                        if (regForm.ShowDialog() == DialogResult.Yes) { }
+                        else
+                            loop = false;
+                    }
+                    else
+                        loop = false;
+                }
+
+                discoveryThread.Resume();
+                this.Show();
             }
         }
 

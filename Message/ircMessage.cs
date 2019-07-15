@@ -11,13 +11,27 @@ namespace irc
         public string sender_username;
         public string receiver_username;
         public string message;
+        public int action;
         //public int hashCode; TODO
 
-        public ircMessage(string myUsername, string myReceiver_username, string myMessage)
+        public ircMessage(string myUsername, string myReceiver_username, string myMessage, int myAction) //action = 2
         {
             sender_username = myUsername;
-            receiver_username = myReceiver_username;
+            receiver_username = myReceiver_username; 
             message = myMessage;
+            action = myAction;
+        }
+
+        public ircMessage(string myUsername, string myPassword, int myAction) //costruttore per Registrazione(0) e Login(1)
+        {
+            message = myUsername + "~" + myPassword;
+            action = myAction; //azione di invio messaggio
+        }
+
+        public ircMessage(string myUsername, int myAction) //costruttore per Logout(3)
+        {
+            sender_username = myUsername;
+            action = myAction; //azione di invio messaggio
         }
 
         /// <summary>
