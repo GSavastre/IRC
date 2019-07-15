@@ -3,6 +3,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using irc;
+using System.Net;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace Client
 {
@@ -18,6 +21,7 @@ namespace Client
 
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
+            StartTcpListenerThread();
         }
 
         private void btn_register_Click(object sender, EventArgs e)
@@ -34,17 +38,9 @@ namespace Client
                     stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
                     stream.Close();
                     client.Close();
-
-                    ///TODO: ASPETTARE ESITO REGISTRAZIONE E POI CREARE UTENTE 
-                    //ircUser curruntUser = new ircUser(id, username, address)
-
-                    Form myHome = new Home(server_addr);
-                    this.Hide();
-                    myHome.Show();
-                    this.Close();
                 }
                 else
-                    MessageBox.Show("LE PASSWORD NON COINCIDONO");
+                    MessageBox.Show("Le password non coincidono. Riprova !");
             }
             catch (Exception ex)
             {
@@ -56,6 +52,50 @@ namespace Client
         {
             this.DialogResult = DialogResult.Yes;
             this.Close();
+        }
+
+        private void StartTcpListenerThread()
+        {
+            TcpListener listener = new TcpListener(IPAddress.Any, server_port);
+            TcpClient client = null;
+            listener.Start();
+            Thread tcpListenerThread = null;
+            tcpListenerThread = new Thread(() =>
+            {
+                tcpListenerThread.IsBackground = true;
+                while (true)
+                {
+                    try
+                    {
+                        client = listener.AcceptTcpClient();
+                        byte[] buffer = new byte[1024];
+                        NetworkStream stream = client.GetStream();
+                        stream.Read(buffer, 0, buffer.Length);
+
+                        if (ircMessage.BytesToObj(buffer).ToString().Equals("IRCSERVER_INVALID_LOGIN"))
+                        {
+                            MessageBox.Show("Invalid Login !");
+                            break;
+                        }
+                        else
+                        {
+                            List<ircUser> online_users = null;//(List<ircUser>)ircMessage.BytesToObj(buffer);
+
+                            Form myHome = new Home(server_addr, online_users);
+                            this.Hide();
+                            myHome.ShowDialog();
+                            this.Close();
+                            break;
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            });
+            tcpListenerThread.Start();
         }
     }
 }

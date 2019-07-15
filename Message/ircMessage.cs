@@ -7,14 +7,14 @@ namespace irc
 {
     [Serializable]
     public class ircMessage
-    {
+    {        
         public string sender_username;
         public string receiver_username;
         public string message;
         public int action;
         //public int hashCode; TODO
 
-        public ircMessage(string myUsername, string myReceiver_username, string myMessage, int myAction) //action = 2
+        public ircMessage(string myUsername, string myReceiver_username, string myMessage, int myAction) //costruttore Message
         {
             sender_username = myUsername;
             receiver_username = myReceiver_username; 

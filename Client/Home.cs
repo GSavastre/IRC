@@ -24,7 +24,7 @@ namespace Client
 
         Thread tcpListenerThread = null;
 
-        public Home(string myServer_addr)
+        public Home(string myServer_addr, List<ircUser> online_users)
         {
             InitializeComponent();
             server_addr = myServer_addr;
@@ -134,7 +134,7 @@ namespace Client
                         NetworkStream stream = client.GetStream();
                         stream.Read(buffer, 0, buffer.Length);
 
-                        ircMessage msg = ircMessage.BytesToObj(buffer);
+                        ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer);
                         MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
                         
                         /*

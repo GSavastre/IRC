@@ -125,7 +125,7 @@ namespace Client {
 
                 this.Hide();
                 Form loginForm = new Login(selectedServerIp);
-                Form regForm = new Register(selectedServerIp);
+                //Form regForm = new Register(selectedServerIp);
 
                 bool loop = true;
                 while (loop)
@@ -133,9 +133,9 @@ namespace Client {
                     if (loginForm.ShowDialog() == DialogResult.Yes)
                     {
 
-                        if (regForm.ShowDialog() == DialogResult.Yes) { }
-                        else
-                            loop = false;
+                        //if (regForm.ShowDialog() == DialogResult.Yes) { }
+                        //else
+                        //    loop = false;
                     }
                     else
                         loop = false;

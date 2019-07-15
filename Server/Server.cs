@@ -9,6 +9,7 @@ using System.Data;
 using System.Web.Helpers;
 using System.Threading;
 using irc;
+using System.Linq;
 
 namespace Server
 {
@@ -36,7 +37,7 @@ namespace Server
 
             try
             {
-                //server.Start();
+                server.Start();
                 Console.WriteLine("Server started...");
             }
             catch (SocketException e)
@@ -49,9 +50,6 @@ namespace Server
             {               
                 while (true)
                 {
-                    //Il server deve sempre avere il listener attivato per poter rispondere ai client man mano che lo cercano
-                    DiscoveryListener();
-
                     TcpClient client = default(TcpClient);
                     client = server.AcceptTcpClient();
                 
@@ -60,28 +58,28 @@ namespace Server
 
                     stream.Read(buffer, 0, buffer.Length);
 
-                    ircMessage msg = ircMessage.BytesToObj(buffer);
+                    ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer);
                     switch (msg.action)
                     {
-                        case 0:                                                             //Registrazione nuovo utente
-                            Console.WriteLine("REGISTER_USER_REQUEST Received");
+                        case 0: //Registrazione nuovo utente
+                            Console.WriteLine("REGISTER_USER_REQUEST received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
                             Register(msg.message.Split('~')[0], msg.message.Split('~')[1]);     //msg.message contiene username+password; vado a divide la stringa in 2
                             break;
 
                         case 1: //Login
-                            Console.WriteLine("LOGIN_USER_REQUEST Received");
-                            //Login() to fix, no need to pass user pwd
+                            Console.WriteLine("LOGIN_USER_REQUEST received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
                             break;
                         case 2: //Message
-                            Console.WriteLine("MESSAGE Received");
+                            Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
+                            RedirectData(msg.receiver_username, msg);
                             break;
                         case 3: //Logout
-                            Console.WriteLine("Logout case");
+                            Console.WriteLine("LOGOUT_USER_REQUEST case " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
                             break;
                     }
                 }
             });
-            //tcpListnerThread.Start();
+            tcpListnerThread.Start();
         }
 
         #region discoveryListener
@@ -169,8 +167,25 @@ namespace Server
 
         #endregion
 
-        void RedirectData() {
-            //TODO 
+        void RedirectData(string myReceiver_username, ircMessage msg) {
+            ircUser receiver = onlineUsers.Where(user => user.username.Equals(myReceiver_username)).FirstOrDefault();
+            if (receiver != null) {
+                try
+                {
+                    TcpClient client = new TcpClient(receiver.address, port);
+                    
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
+
+                    stream.Close();
+                    client.Close();
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("RedirectData Exception : " + ex.Message);
+                }
+            }
         }
         
     }
