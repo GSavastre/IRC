@@ -81,7 +81,6 @@ namespace Server
                             break;
                         case 2: //Message
                             Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
-                            RedirectData(msg.receiver_username, msg);
                             break;
                         case 3: //Logout
                             Console.WriteLine("LOGOUT_REQUEST received");
@@ -199,8 +198,8 @@ namespace Server
 
         #endregion
 
-        void RedirectData(string myReceiver_username, ircMessage msg) {
-            ircUser receiver = onlineUsers.Where(user => user.username.Equals(myReceiver_username)).FirstOrDefault();
+        void RedirectData(ircMessage msg) {
+            ircUser receiver = onlineUsers.Where(user => user.username.Equals(msg.receiver_username)).FirstOrDefault();
             if (receiver != null) {
                 try
                 {
@@ -217,16 +216,116 @@ namespace Server
                 {
                     Console.WriteLine("RedirectData Exception : " + ex.Message);
                 }
+            } else {
+                CacheMessage(msg);
+            }
+        }
+        /// <summary>
+        ///  Invia un messaggio 
+        /// </summary>
+        /// <param name="destAddres">Indirizzo di destinazione</param>
+        /// <param name="message">Messaggio di tipo <see cref="irc"/> da inviare</param>
+        /// <remarks>
+        ///     Nel caso l'utente associato all'indirizzo non fosse trovato nella lista di utenti online verrà chiamato il metodo
+        ///     <see cref="CacheMessage(ircMessage)"/>
+        /// </remarks>
+        void Send(string destAddress,ircMessage message) {
+            //Cerco l'esistenza dell'utente nella lista di utenti online su questo server
+            ircUser receiver = onlineUsers.Where(user => user.username.Equals(message.receiver_username)).FirstOrDefault();
+
+            //Se l'utente non è online archivio il messaggio altrimenti gli invio il messaggio
+            if (receiver == null) {
+                CacheMessage(message);
+            } else {
+                TcpClient sender = new TcpClient(destAddress, port);
+                Byte[] data = ircMessage.ObjToBytes(message);
+
+                NetworkStream stream = sender.GetStream();
+
+                stream.Write(data, 0, data.Length);
             }
         }
 
-        void Send(string destAddres,ircMessage message) {
-            TcpClient sender = new TcpClient(destAddres, port);
-            Byte[] data = ircMessage.ObjToBytes(message);
+        /// <summary>
+        ///  Salva un messaggio sul database.
+        /// </summary>
+        /// <param name="message">
+        ///     Messaggio da archiviare di tipo <see cref="ircMessage"/>
+        /// </param>
+        void CacheMessage(ircMessage message) {
+            DBManager dbManager = new DBManager();
 
-            NetworkStream stream = sender.GetStream();
+            Console.WriteLine($"Svolgo i controlli necessari per archiviare il messaggio per {message.receiver_username}");
 
-            stream.Write(data, 0, data.Length);
+            //Se per qualche motivo l'utente che ha inviato il messaggio non esiste all'interno del DB non invio il messaggio
+            DataTable senderIdResult = dbManager.Query(table: TableNames.usersTable, queryString: $"SELECT user_id FROM {TableNames.usersTable} WHERE username = '{message.sender_username}';");
+            if (senderIdResult.Rows.Count != 1) {
+                Console.WriteLine($"Errore nel trovare mittente {message.sender_username}");
+                return;
+            }
+            int senderId = (int)senderIdResult.Rows[0]["user_id"];
+
+            //Se per qualche motivo l'utente che deve ricevere il messaggio non esiste nel DB non invio il messaggio
+            DataTable receiverIdResult = dbManager.Query(table: TableNames.usersTable, queryString: $"SELECT user_id FROM {TableNames.usersTable} WHERE username = '{message.receiver_username}';");
+            if (receiverIdResult.Rows.Count != 1) {
+                Console.WriteLine($"Errore nel trovare destinatario {message.receiver_username}");
+                return;
+            }
+            int receiverId = (int)receiverIdResult.Rows[0]["user_id"];
+
+            Console.WriteLine($"Aggiungo ai messaggi archiviati");
+            dbManager.Insert(table: TableNames.messagesTable, new Dictionary<string, string> {
+                {"sender", senderId.ToString()},
+                {"receiver", receiverId.ToString() },
+                {"text", message.message},
+                {"created_at", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+            });
+        }
+
+        /// <summary>
+        ///  Ricerca tutti i messaggi archiviati dell'utente.
+        /// </summary>
+        /// <param name="username">Username verso cui sono indirizzati i messaggi</param>
+        /// <returns>Lista di messagi <see cref="ircMessage"/></returns>
+        /// <remarks>Nel caso non ci fossero messaggi la lista sarà vuota</remarks>
+        List<ircMessage> GetCachedMessages(string username) {
+            List<ircMessage> messages = new List<ircMessage>();
+            DBManager dbManager = new DBManager();
+
+            //Ottengo tutti i messaggi indirizzati verso username
+            DataTable messagesResult = dbManager.Query(table: TableNames.messagesTable, 
+                                                       queryString: $"SELECT sender, receiver text " +
+                                                                    $"FROM {TableNames.messagesTable},{TableNames.usersTable} " +
+                                                                    $"WHERE username = '{username}' AND receiver = user_id AND {TableNames.messagesTable}.read = 0;");
+            
+            //Uso messaggio come variabile d'appoggio per l'aggiunta alla lista di messaggi invece di fare messages.Add(new ircMessage(etc...))
+            ircMessage messaggio = new ircMessage();
+            //Il ricevente sarà sempre l'utente cercato
+            messaggio.receiver_username = username;
+            //L'azione sarà di tipo "messaggio"
+            messaggio.action = 3;
+            DataTable senderUsernameResult;
+
+            //Ciclo ogni riga del risultato dei messaggi archiviati
+            foreach (DataRow row in messagesResult.Rows) {
+
+                //Ottengo il nome utente di colui che ha inviato il messaggio
+                senderUsernameResult = dbManager.Query(table: TableNames.usersTable,
+                                                                 queryString: $"SELECT username FROM {TableNames.usersTable} WHERE user_id = '{row["sender"].ToString()}';");
+
+                //Controllo che quell'utente esista all'interno del DB
+                if (senderUsernameResult.Rows.Count != 1) {
+                    messaggio.sender_username = "Unknown user";
+                } else {
+                    messaggio.sender_username = senderUsernameResult.Rows[0]["username"].ToString();
+                }
+
+                messaggio.message = row["text"].ToString();
+
+                messages.Add(messaggio);
+            }
+
+            return messages;
         }
     }
 }
