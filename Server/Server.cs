@@ -10,6 +10,7 @@ using System.Web.Helpers;
 using System.Threading;
 using System.Linq;
 using irc;
+using System.Net.NetworkInformation;
 
 namespace Server
 {
@@ -29,6 +30,9 @@ namespace Server
         {
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
             discoveryListener.Start();
+
+            Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
+            pingOnlineUsers.Start();
 
             IPAddress ip = IPAddress.Any;
             TcpListener server = new TcpListener(ip, port);
@@ -140,6 +144,36 @@ namespace Server
         }
         #endregion
 
+        void PingUsers() {
+            Ping ping = new Ping();
+
+            while (true) {
+
+                if (onlineUsers != null) {
+                    foreach (ircUser user in onlineUsers.ToList()) {
+                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")}:Invio ping TCP a {user.username} all'indirizzo {user.address}");
+                        TcpClient tcpClient = new TcpClient();
+
+                        try {
+                            tcpClient.Connect(user.address, port);
+                            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")}:Connessione TCP avvenuta con successo per {user.username}");
+                            tcpClient.Close();
+                        } catch (Exception) {
+                            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")}:Connessione TCP fallita per {user.username}");
+                            Logout(user.username);
+                        }
+
+                        try {
+                            tcpClient.Dispose();
+                        } catch (Exception ex) {
+                            Console.WriteLine(ex.Message);
+                        }
+                        Thread.Sleep(500);
+                    }
+                }
+            }
+        }
+
         #region userAuth
 
         private List<ircUser> Login(string username, string password, string address) {
@@ -159,7 +193,7 @@ namespace Server
                     return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
-                        Console.WriteLine("Login avvenuto con succceso per " + username);
+                        Console.WriteLine("Login avvenuto con successo per " + username);
                         onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
                         return onlineUsers;
                     } else {
