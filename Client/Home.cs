@@ -158,7 +158,7 @@ namespace Client
             {
                 client = new TcpClient(server_addr, port);
 
-                ircMessage msg_logout = new ircMessage(current_user.username, 2);
+                ircMessage msg_logout = new ircMessage(current_user.username, 3);
                 stream = client.GetStream();
                 stream.Write(ircMessage.ObjToBytes(msg_logout), 0, ircMessage.ObjToBytes(msg_logout).Length);
 

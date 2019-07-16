@@ -160,7 +160,7 @@ namespace Server
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
                         Console.WriteLine("Login avvenuto con succceso per " + username);
-                        onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
+                        onlineUsers.Add(new ircUser(username, address));
                         return onlineUsers;
                     } else {
                         Console.WriteLine($"Login fallito per {username}");
