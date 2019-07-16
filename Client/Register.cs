@@ -6,6 +6,7 @@ using irc;
 using System.Net;
 using System.Threading;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Client
 {
@@ -14,6 +15,9 @@ namespace Client
         string server_addr;
         int server_port = 7777;
         TcpClient client;
+        Thread tcpListenerThread = null; //thread client listener
+        List<ircUser> online_users = null; /// lista di utenti
+        TcpListener listener = null;
 
         public Register(string myServer_addr)
         {
@@ -27,7 +31,7 @@ namespace Client
         private void btn_register_Click(object sender, EventArgs e)
         {
             try
-            {
+            {              
                 if (tb_password_repeat.Text == tb_password.Text)
                 {
                     client = new TcpClient(server_addr, server_port);
@@ -38,56 +42,64 @@ namespace Client
                     stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
                     stream.Close();
                     client.Close();
+
+                    /*if (!tcpListenerThread.IsAlive)
+                    {
+                        Form myHome = new Home(server_addr, online_users);
+                        this.Hide();
+                        myHome.ShowDialog();
+                        this.Close();
+                    }*/
                 }
                 else
                     MessageBox.Show("Le password non coincidono. Riprova !");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void btn_switch_login_Click(object sender, EventArgs e)
         {
+            listener.Stop();
+            client.Close();
+            tcpListenerThread.Abort();
             this.DialogResult = DialogResult.Yes;
             this.Close();
         }
 
         private void StartTcpListenerThread()
         {
-            TcpListener listener = new TcpListener(IPAddress.Any, server_port);
+            listener = new TcpListener(IPAddress.Any, server_port);
             TcpClient client = null;
             listener.Start();
-            Thread tcpListenerThread = null;
+            
             tcpListenerThread = new Thread(() =>
             {
-                tcpListenerThread.IsBackground = true;
-                while (true)
+                bool loop = true;
+                while (loop)
                 {
                     try
                     {
                         client = listener.AcceptTcpClient();
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
-                        stream.Read(buffer, 0, buffer.Length);
+                        int len = stream.Read(buffer, 0, buffer.Length);
 
-                        if (ircMessage.BytesToObj(buffer).ToString().Equals("IRCSERVER_INVALID_LOGIN"))
+                        if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0)
                         {
-                            MessageBox.Show("Invalid Login !");
-                            break;
+                            MessageBox.Show("Invalid Register !");                           
                         }
-                        else
+                        else if(len!=0)
                         {
-                            List<ircUser> online_users = null;//(List<ircUser>)ircMessage.BytesToObj(buffer);
-
-                            Form myHome = new Home(server_addr, online_users);
-                            this.Hide();
-                            myHome.ShowDialog();
-                            this.Close();
-                            break;
+                            List<ircUser> online_users = (List<ircUser>)ircMessage.BytesToObj(buffer,len);
+                            listener.Stop();
+                            loop = false;
                         }
-
+                        len = 0;
+                        stream.Close();
+                        client.Close();
                     }
                     catch (Exception e)
                     {
@@ -95,6 +107,7 @@ namespace Client
                     }
                 }
             });
+            tcpListenerThread.IsBackground = true;
             tcpListenerThread.Start();
         }
     }

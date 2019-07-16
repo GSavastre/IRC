@@ -125,17 +125,16 @@ namespace Client {
 
                 this.Hide();
                 Form loginForm = new Login(selectedServerIp);
-                //Form regForm = new Register(selectedServerIp);
-
+                Form regForm;
                 bool loop = true;
                 while (loop)
                 {
                     if (loginForm.ShowDialog() == DialogResult.Yes)
                     {
-
-                        //if (regForm.ShowDialog() == DialogResult.Yes) { }
-                        //else
-                        //    loop = false;
+                        regForm = new Register(selectedServerIp);
+                        if (regForm.ShowDialog() == DialogResult.Yes) { }
+                        else
+                            loop = false;
                     }
                     else
                         loop = false;
