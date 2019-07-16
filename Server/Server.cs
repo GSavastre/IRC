@@ -15,12 +15,12 @@ namespace Server
 {
     class Server
     {
-        
+
         //Porta su cui il server gestirà le comunicazioni discovery
         private const int discoveryPort = 7778;
 
         private const int port = 7777;
-        
+
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
         Thread tcpListnerThread = null;
@@ -29,10 +29,10 @@ namespace Server
         {
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
             discoveryListener.Start();
-            
+
             IPAddress ip = IPAddress.Any;
-            TcpListener server = new TcpListener (ip, port);
-            
+            TcpListener server = new TcpListener(ip, port);
+
             onlineUsers = new List<ircUser>();
 
             try
@@ -51,7 +51,7 @@ namespace Server
                 TcpClient client = default(TcpClient);
 
                 while (true) {
-                
+
                     client = server.AcceptTcpClient();
 
                     byte[] buffer = new byte[1024];
@@ -74,7 +74,7 @@ namespace Server
                             break;
                         case 1: //Login
                             Console.WriteLine("LOGIN_USER_REQUEST Received");
-                            Send(senderAddress, Login(msg.message.Split(':')[0],msg.message.Split(':')[1], senderAddress));
+                            Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
                             break;
                         case 2: //Message
                             Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
@@ -82,7 +82,7 @@ namespace Server
                         case 3: //Logout
                             Console.WriteLine("LOGOUT_REQUEST received");
                             Logout(msg.sender_username);
-                            break;                       
+                            break;
                     }
 
                     client.Close();
@@ -170,7 +170,7 @@ namespace Server
             Console.WriteLine($"Login fallito per {username}");
             return new List<ircUser>();
         }
-        
+
         private void Register(string username, string password) {
             Console.WriteLine($"Inizio processo di registrazione per {username}");
             DBManager dbManager = new DBManager();
@@ -184,7 +184,7 @@ namespace Server
         private void Logout(string username) {
             Console.WriteLine($"Inizio il processo di LOGOUT per {username}");
             //Cerco se l'utente è presente nella lista di utenti online su questo server
-            ircUser loggedUser = onlineUsers.Where(user=>user.username.Equals(username)).FirstOrDefault();
+            ircUser loggedUser = onlineUsers.Where(user => user.username.Equals(username)).FirstOrDefault();
 
             if (loggedUser != null) {
                 onlineUsers.Remove(loggedUser);
@@ -196,13 +196,17 @@ namespace Server
 
         #endregion
 
+        /// <summary>
+        ///  Redirigo un messaggio ircMessage ad un utente
+        /// </summary>
+        /// <param name="msg">Messaggio ircMessage da reinderizzare</param>
         void RedirectData(ircMessage msg) {
             ircUser receiver = onlineUsers.Where(user => user.username.Equals(msg.receiver_username)).FirstOrDefault();
             if (receiver != null) {
                 try
                 {
                     TcpClient client = new TcpClient(receiver.address, port);
-                    
+
                     NetworkStream stream = client.GetStream();
                     stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
 
@@ -218,23 +222,22 @@ namespace Server
             {
                 CacheMessage(msg);
             }
-            
         }
+
         /// <summary>
         ///  Invia un messaggio 
         /// </summary>
         /// <param name="destAddres">Indirizzo di destinazione</param>
-        /// <param name="message">Messaggio di tipo <see cref="irc"/> da inviare</param>
+        /// <param name="users">Messaggio di tipo <see cref="irc"/> da inviare</param>
         /// <remarks>
         ///     Nel caso l'utente associato all'indirizzo non fosse trovato nella lista di utenti online verrà chiamato il metodo
         ///     <see cref="CacheMessage(ircMessage)"/>
         /// </remarks>
-
-        void Send(string destAddress, List<ircUser> message) {
+        void Send(string destAddress, List<ircUser> users) {
             try
             {
                 TcpClient sender = new TcpClient(destAddress, port);
-                Byte[] data = ircMessage.ObjToBytes(message);
+                byte[] data = ircMessage.ObjToBytes(users);
 
                 NetworkStream stream = sender.GetStream();
 
@@ -292,11 +295,11 @@ namespace Server
             DBManager dbManager = new DBManager();
 
             //Ottengo tutti i messaggi indirizzati verso username
-            DataTable messagesResult = dbManager.Query(table: TableNames.messagesTable, 
+            DataTable messagesResult = dbManager.Query(table: TableNames.messagesTable,
                                                        queryString: $"SELECT sender, receiver text " +
                                                                     $"FROM {TableNames.messagesTable},{TableNames.usersTable} " +
                                                                     $"WHERE username = '{username}' AND receiver = user_id AND {TableNames.messagesTable}.read = 0;");
-            
+
             //Uso messaggio come variabile d'appoggio per l'aggiunta alla lista di messaggi invece di fare messages.Add(new ircMessage(etc...))
             ircMessage messaggio = new ircMessage();
             //Il ricevente sarà sempre l'utente cercato
@@ -325,6 +328,17 @@ namespace Server
             }
 
             return messages;
+        }
+
+        /// <summary>
+        ///  Ricerca tutti i messaggi archiviati dell'utente.
+        /// </summary>
+        /// <param name="excluded_user">Username verso cui sono indirizzati i messaggi</param>
+        void UpdateOnlineUsers(ircUser excluded_user) {
+            foreach (ircUser user in onlineUsers) {
+                if(user != excluded_user)
+                Send(user.address, onlineUsers);
+            }
         }
     }
 }
