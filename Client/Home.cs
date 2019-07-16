@@ -24,23 +24,17 @@ namespace Client
 
         Thread tcpListenerThread = null;
 
-        public Home(string myServer_addr, List<ircUser> online_users)
+        public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
             InitializeComponent();
             server_addr = myServer_addr;
-            //current_user = myCurrent_user;
-            //online_users = myOnline_users;
-
-           current_user = new ircUser(0, "Dax", "192.168.0.107");
-           online_users = new List<ircUser> {
-                new ircUser(1, "Loca", ""),
-                new ircUser(2, "Sava", "")
-            };
-
+            current_user = myCurrent_user;
+            online_users = myOnline_users;
+            
             l_user.Text = current_user.username;
 
             LoadContacts(online_users);
-            StartTcpListenerThread();
+            //StartTcpListenerThread();
         }
 
         /// <summary>
@@ -50,59 +44,63 @@ namespace Client
         ///     List<ircUser> contenente gli utenti online
         /// </param>
         void LoadContacts(List<ircUser> users) {
-            foreach (ircUser user in online_users) {
-                Panel panel = new Panel
+            foreach (ircUser user in users) {
+                if (user.username != current_user.username)
                 {
-                    Size = new Size(252, 48)
-                };
+                    Panel panel = new Panel
+                    {
+                        Size = new Size(252, 48)
+                    };
 
-                Label label_user = new Label
-                {
-                    Text = user.username,
-                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                    Location = new Point(10, 10),
-                    Size = new Size(70, 16)
-                };
+                    Label label_user = new Label
+                    {
+                        Text = user.username,
+                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                        Location = new Point(10, 10),
+                        Size = new Size(70, 16)
+                    };
 
-                Button btn = new Button
-                {
-                    Size = new Size(75, 34),
-                    Tag = user,
-                    Text = "Start Chat",
-                    Location = new Point(165, 7)
-                };
-                btn.Click += new EventHandler(startChat_Button_Click);
+                    Button btn = new Button
+                    {
+                        Size = new Size(75, 34),
+                        Tag = user,
+                        Text = "Start Chat",
+                        Location = new Point(165, 7)
+                    };
 
-                Button btn_status = new Button
-                {
-                    Size = new Size(15, 15),
-                    Location = new Point(12, 28),
-                    BackColor = Color.LimeGreen
-                };
+                    btn.Click += new EventHandler(startChat_Button_Click);
 
-                Label label_online = new Label
-                {
-                    Text = "Online",
-                    Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic),
-                    Location = new Point(33, 30),
-                    Size = new Size(37, 13)
-                };
+                    Button btn_status = new Button
+                    {
+                        Size = new Size(15, 15),
+                        Location = new Point(12, 28),
+                        BackColor = Color.LimeGreen
+                    };
 
-                Label sep = new Label
-                {
-                    AutoSize = false,
-                    Height = 2,
-                    Width = 250,
-                    BorderStyle = BorderStyle.Fixed3D
-                };
+                    Label label_online = new Label
+                    {
+                        Text = "Online",
+                        Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic),
+                        Location = new Point(33, 30),
+                        Size = new Size(37, 13)
+                    };
 
-                panel.Controls.Add(label_user);
-                panel.Controls.Add(btn);
-                panel.Controls.Add(btn_status);
-                panel.Controls.Add(label_online);
+                    Label sep = new Label
+                    {
+                        AutoSize = false,
+                        Height = 2,
+                        Width = 250,
+                        BorderStyle = BorderStyle.Fixed3D
+                    };
 
-                flp_contacts.Controls.Add(panel);
-                flp_contacts.Controls.Add(sep);
+                    panel.Controls.Add(label_user);
+                    panel.Controls.Add(btn);
+                    panel.Controls.Add(btn_status);
+                    panel.Controls.Add(label_online);
+
+                    flp_contacts.Controls.Add(panel);
+                    flp_contacts.Controls.Add(sep);
+                }
             }
         }
 
@@ -112,7 +110,7 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            ircUser partner = new ircUser(((ircUser)partner_button.Tag).id, ((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
+            ircUser partner = new ircUser(((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
             Form chat = new Chat(partner, server_addr);
             chat.Show();
         }

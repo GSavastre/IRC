@@ -8,14 +8,13 @@ namespace irc
     [Serializable]
     public class ircUser
     {
-        public int id;
         public string username;
         public string address;
 
-        public ircUser(int id, string username, string address) {
-            this.id = id;
+        public ircUser(string username, string address) {
             this.username = username;
             this.address = address;
         }
+
     }
 }

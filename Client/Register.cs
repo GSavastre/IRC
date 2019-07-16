@@ -62,16 +62,15 @@ namespace Client
                             }
                             else
                             {
-                                MessageBox.Show("Registrazione effettuata !");
                                 online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-
-                                MessageBox.Show("Home Apertura");
-                                Form myHome = new Home(server_addr, online_users);
 
                                 streamlistener.Close();
                                 clientlistener.Close();
+
+                                Form home = new Home(server_addr, new ircUser(tb_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
+                                
                                 this.Hide();
-                                myHome.ShowDialog();
+                                home.ShowDialog();
                                 this.Close();
                                 break;
                             }
