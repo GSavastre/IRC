@@ -58,12 +58,7 @@ namespace Server
                     NetworkStream stream = client.GetStream();
 
                     int len = stream.Read(buffer, 0, buffer.Length);
-                    /*
-                    byte[] newBuffer = new byte[len];
-                    for (int i = 0; i < len; i++) {
-                        newBuffer[i] = buffer[i];
-                    }*/
-
+                    
                     ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
                     string senderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                     switch (msg.action) {
