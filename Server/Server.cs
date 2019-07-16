@@ -64,7 +64,7 @@ namespace Server
                         newBuffer[i] = buffer[i];
                     }
 
-                    ircMessage msg = ircMessage.BytesToObj(newBuffer);
+                    ircMessage msg = (ircMessage)ircMessage.BytesToObj(newBuffer,len);
                     //Console.WriteLine($"Ricevuto {Encoding.ASCII.GetString(buffer)}");
                     //Console.ReadLine();
                     //ircMessage msg = null;
