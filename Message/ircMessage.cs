@@ -15,6 +15,8 @@ namespace irc
         public int action { get; set; }
         //public int hashCode; TODO
 
+        public ircMessage() { }
+
         public ircMessage(string myUsername, string myReceiver_username, string myMessage, int myAction) //costruttore Message
         {
             sender_username = myUsername;
