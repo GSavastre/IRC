@@ -223,6 +223,7 @@ C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CoreCompileInp
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.exe
 C:\Users\Gabriele\source\repos\IRC\Server\obj\Debug\Server.pdb
+<<<<<<< HEAD
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Microsoft.Win32.Primitives.dll
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\netstandard.dll
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\System.AppContext.dll
@@ -336,3 +337,10 @@ C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe.config
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.exe
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\bin\Debug\Server.pdb
 C:\Users\Dax\Documents\Uni\Reti\IRC\Server\obj\Debug\Server.csproj.CopyComplete
+=======
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.csprojAssemblyReference.cache
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.exe.config
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.exe
+C:\Users\Locas\Desktop\IRC\Server\obj\Debug\Server.pdb
+>>>>>>> Client_Thread_Fix
