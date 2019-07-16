@@ -40,7 +40,7 @@ namespace irc
         /// </summary>
         /// <param msg="obj Message da convertire">
         /// </param>
-        public static byte[] ObjToBytes(ircMessage msg)
+        public static byte[] ObjToBytes(object msg)
         {
             BinaryFormatter bf = new BinaryFormatter();
             using (MemoryStream ms = new MemoryStream())
@@ -55,16 +55,14 @@ namespace irc
         /// </summary>
         /// <param msg="array di byte da convertire">
         /// </param>
-        public static ircMessage BytesToObj(byte[] msg)
+        public static object BytesToObj(byte[] msg, int len)
         {
-            //string messaggio = Encoding.ASCII.GetString(msg);
-
             using (MemoryStream ms = new MemoryStream())
             {
                 BinaryFormatter bf = new BinaryFormatter();
-                ms.Write(msg, 0, msg.Length);
+                ms.Write(msg, 0, len);
                 ms.Seek(0, SeekOrigin.Begin);
-                ircMessage m = (ircMessage)bf.Deserialize(ms);
+                object m = bf.Deserialize(ms);
                 return m;
             }
         }

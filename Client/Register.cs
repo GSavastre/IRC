@@ -70,9 +70,9 @@ namespace Client
                         client = listener.AcceptTcpClient();
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
-                        stream.Read(buffer, 0, buffer.Length);
+                        int len = stream.Read(buffer, 0, buffer.Length);
 
-                        if (ircMessage.BytesToObj(buffer).ToString().Equals("IRCSERVER_INVALID_LOGIN"))
+                        if (ircMessage.BytesToObj(buffer, len).ToString().Equals("IRCSERVER_INVALID_LOGIN"))
                         {
                             MessageBox.Show("Invalid Login !");
                             break;

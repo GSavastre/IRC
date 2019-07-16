@@ -58,25 +58,22 @@ namespace Server
                     NetworkStream stream = client.GetStream();
 
                     int len = stream.Read(buffer, 0, buffer.Length);
-
+                    /*
                     byte[] newBuffer = new byte[len];
                     for (int i = 0; i < len; i++) {
                         newBuffer[i] = buffer[i];
-                    }
+                    }*/
 
-                    ircMessage msg = ircMessage.BytesToObj(newBuffer);
-                    //Console.WriteLine($"Ricevuto {Encoding.ASCII.GetString(buffer)}");
-                    //Console.ReadLine();
-                    //ircMessage msg = null;
+                    ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                    string senderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                     switch (msg.action) {
                         case 0: //Registrazione nuovo utente
                             Console.WriteLine("REGISTER_USER_REQUEST Received");
                             Register(msg.message.Split(':')[0], msg.message.Split(':')[1]);     //msg.message contiene username+password; vado a dividere la stringa in 2
+                            Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
                             break;
-
                         case 1: //Login
                             Console.WriteLine("LOGIN_USER_REQUEST Received");
-                            string senderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                             Send(senderAddress, Login(msg.message.Split(':')[0],msg.message.Split(':')[1], senderAddress));
                             break;
                         case 2: //Message
@@ -86,8 +83,11 @@ namespace Server
                         case 3: //Logout
                             Console.WriteLine("LOGOUT_REQUEST received");
                             Logout(msg.sender_username);
-                            break;
+                            break;                       
                     }
+
+                    client.Close();
+                    stream.Close();
                 }
             });
             tcpListnerThread.Start();
@@ -143,10 +143,9 @@ namespace Server
 
         #region userAuth
 
-        private ircMessage Login(string username, string password, string address) {
+        private List<ircUser> Login(string username, string password, string address) {
 
             Console.WriteLine($"Inizio processo di login per {username}");
-            string invalidRequest = "IRCSERVER_INVALID_LOGIN";
 
             //Ricerco se l'utente è già presente nella lista di utenti online su questo server
             ircUser loggedUser = onlineUsers.Where(user => user.username.Equals(username)).FirstOrDefault();
@@ -158,20 +157,19 @@ namespace Server
 
                 if (result.Rows.Count != 1) {
                     Console.WriteLine($"Login fallito per {username}");
-                    return new ircMessage("", "", invalidRequest, 0);
+                    return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
                         onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
+                        return onlineUsers;
                     } else {
                         Console.WriteLine($"Login fallito per {username}");
-                        return new ircMessage("", "", invalidRequest, 0);
+                        return new List<ircUser>();
                     }
                 }
-                Console.WriteLine($"Login avvenuto con successo per {username}");
-                return new ircMessage("", "", "successo", 0);
             }
             Console.WriteLine($"Login fallito per {username}");
-            return new ircMessage("", "", invalidRequest, 0);
+            return new List<ircUser>();
         }
         
         private void Register(string username, string password) {
@@ -218,11 +216,15 @@ namespace Server
                     Console.WriteLine("RedirectData Exception : " + ex.Message);
                 }
             }
+            else
+            {
+                //CacheMessage(msg);
+            }
         }
 
-        void Send(string destAddres,ircMessage message) {
+        void Send(string destAddres, object message) {
             TcpClient sender = new TcpClient(destAddres, port);
-            Byte[] data = ircMessage.ObjToBytes(message);
+            byte[] data = ircMessage.ObjToBytes(message);
 
             NetworkStream stream = sender.GetStream();
 

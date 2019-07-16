@@ -132,9 +132,9 @@ namespace Client
                         client = listener.AcceptTcpClient();
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
-                        stream.Read(buffer, 0, buffer.Length);
+                        int len = stream.Read(buffer, 0, buffer.Length);
 
-                        ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer);
+                        ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
                         MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
                         
                         /*

@@ -35,14 +35,15 @@ namespace Client
             {
                 client = new TcpClient(server_addr, server_port);
                 
-                /*ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
+                ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
                 NetworkStream stream = client.GetStream();
                 stream.Write(ircMessage.ObjToBytes(regMessage), 0, ircMessage.ObjToBytes(regMessage).Length);
                 
                 stream.Close();
-                client.Close();*/
+                client.Close();
                 
+                /*
                 int msgLenght = Encoding.ASCII.GetByteCount("Richiedo Login");  //lunghezza in byte del messaggio 
                 byte[] msg_data = new byte[msgLenght];                      //inzializzo array con dim = lunghezza del messaggio 
                 msg_data = Encoding.ASCII.GetBytes("Richiedo Login");           //inserisco nell array il messaggio in byte 
@@ -50,6 +51,7 @@ namespace Client
                 NetworkStream stream = client.GetStream();
                 stream.Write(msg_data, 0, msgLenght);
                 stream.Close();
+                */
                 
             }
             catch (Exception ex)
@@ -81,8 +83,9 @@ namespace Client
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
                         stream.Read(buffer, 0, buffer.Length);
-
-                        if (((ircMessage)ircMessage.BytesToObj(buffer)).Equals("successo"))
+                        int len = stream.Read(buffer, 0, buffer.Length);
+                        
+                        if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)) != null)
                         {
                             MessageBox.Show("Invalid Login !");
                             break;
@@ -102,7 +105,7 @@ namespace Client
                     {
                         Console.WriteLine(e.Message);
                     }
-                }
+                }                
             });
             tcpListenerThread.Start();
         }
