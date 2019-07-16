@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Web.Helpers;
 using System.Threading;
-using irc;
 using System.Linq;
+using irc;
 
 namespace Server
 {
@@ -159,6 +159,7 @@ namespace Server
                     return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
+                        Console.WriteLine("Login avvenuto con succceso per " + username);
                         onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
                         return onlineUsers;
                     } else {
