@@ -214,13 +214,11 @@ namespace Server
                 {
                     Console.WriteLine("RedirectData Exception : " + ex.Message);
                 }
-            } else {
+            } else
+            {
                 CacheMessage(msg);
             }
-            else
-            {
-                //CacheMessage(msg);
-            }
+            
         }
         /// <summary>
         ///  Invia un messaggio 
@@ -231,20 +229,19 @@ namespace Server
         ///     Nel caso l'utente associato all'indirizzo non fosse trovato nella lista di utenti online verrà chiamato il metodo
         ///     <see cref="CacheMessage(ircMessage)"/>
         /// </remarks>
-        void Send(string destAddress,ircMessage message) {
-            //Cerco l'esistenza dell'utente nella lista di utenti online su questo server
-            ircUser receiver = onlineUsers.Where(user => user.username.Equals(message.receiver_username)).FirstOrDefault();
 
-            //Se l'utente non è online archivio il messaggio altrimenti gli invio il messaggio
-            if (receiver == null) {
-                CacheMessage(message);
-            } else {
+        void Send(string destAddress, List<ircUser> message) {
+            try
+            {
                 TcpClient sender = new TcpClient(destAddress, port);
                 Byte[] data = ircMessage.ObjToBytes(message);
 
                 NetworkStream stream = sender.GetStream();
 
                 stream.Write(data, 0, data.Length);
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Send Exception : " + ex.Message);
             }
         }
 

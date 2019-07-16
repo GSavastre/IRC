@@ -20,7 +20,7 @@ namespace Client
         const int port = 7777;
         string server_addr = "";
         public static ircUser current_user;
-        List<ircUser> online_users;
+        List<ircUser> online_users = null;
 
         Thread tcpListenerThread = null;
 

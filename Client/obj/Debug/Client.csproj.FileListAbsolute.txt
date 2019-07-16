@@ -110,3 +110,4 @@ C:\Users\Dax\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.CoreCompileIn
 C:\Users\Dax\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.CopyComplete
 C:\Users\Dax\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.exe
 C:\Users\Dax\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.pdb
+C:\Users\Dax\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csprojAssemblyReference.cache
