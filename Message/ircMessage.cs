@@ -64,7 +64,8 @@ namespace irc
                 BinaryFormatter bf = new BinaryFormatter();
                 ms.Write(msg, 0, msg.Length);
                 ms.Seek(0, SeekOrigin.Begin);
-                return (ircMessage)bf.Deserialize(ms);
+                ircMessage m = (ircMessage)bf.Deserialize(ms);
+                return m;
             }
         }
 

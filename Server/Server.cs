@@ -57,9 +57,17 @@ namespace Server
                     byte[] buffer = new byte[1024];
                     NetworkStream stream = client.GetStream();
 
-                    stream.Read(buffer, 0, buffer.Length);
+                    int len = stream.Read(buffer, 0, buffer.Length);
 
-                    ircMessage msg = ircMessage.BytesToObj(buffer);
+                    byte[] newBuffer = new byte[len];
+                    for (int i = 0; i < len; i++) {
+                        newBuffer[i] = buffer[i];
+                    }
+
+                    ircMessage msg = ircMessage.BytesToObj(newBuffer);
+                    //Console.WriteLine($"Ricevuto {Encoding.ASCII.GetString(buffer)}");
+                    //Console.ReadLine();
+                    //ircMessage msg = null;
                     switch (msg.action) {
                         case 0: //Registrazione nuovo utente
                             Console.WriteLine("REGISTER_USER_REQUEST Received");
