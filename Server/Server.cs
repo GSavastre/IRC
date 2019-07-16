@@ -188,6 +188,7 @@ namespace Server
 
             if (loggedUser != null) {
                 onlineUsers.Remove(loggedUser);
+                UpdateOnlineUsers();
                 Console.WriteLine($"Utente {username} trovato ed eliminato con successo dalla lista di utenti online");
             } else {
                 Console.WriteLine($"Utente {username} non trovato");
@@ -331,14 +332,14 @@ namespace Server
         }
 
         /// <summary>
-        ///  Ricerca tutti i messaggi archiviati dell'utente.
+        ///  Rimanda la lista di utenti online aggiornata a tutti i client connessi
         /// </summary>
         /// <param name="excluded_user">Username verso cui sono indirizzati i messaggi</param>
-        void UpdateOnlineUsers(ircUser excluded_user) {
+        void UpdateOnlineUsers() {
             foreach (ircUser user in onlineUsers) {
-                if(user != excluded_user)
                 Send(user.address, onlineUsers);
             }
         }
+
     }
 }
