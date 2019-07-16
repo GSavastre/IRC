@@ -16,8 +16,9 @@ namespace Client
         int server_port = 7777;
         TcpClient client;
         Thread tcpListenerThread = null; //thread client listener
-        List<ircUser> online_users = null; /// lista di utenti
-        TcpListener listener = null;
+        List<ircUser> online_users; /// lista di utenti
+        //TcpListener listener = null;
+        TcpListener listener = new TcpListener(IPAddress.Any, 7777);
 
         public Register(string myServer_addr)
         {
@@ -25,13 +26,15 @@ namespace Client
 
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
-            StartTcpListenerThread();
+            
         }
 
         private void btn_register_Click(object sender, EventArgs e)
         {
             try
-            {              
+            {
+                StartTcpListenerThread();
+
                 if (tb_password_repeat.Text == tb_password.Text)
                 {
                     client = new TcpClient(server_addr, server_port);
@@ -43,13 +46,13 @@ namespace Client
                     stream.Close();
                     client.Close();
 
-                    /*if (!tcpListenerThread.IsAlive)
+                    if (online_users.Count() != 0)
                     {
                         Form myHome = new Home(server_addr, online_users);
                         this.Hide();
                         myHome.ShowDialog();
                         this.Close();
-                    }*/
+                    }
                 }
                 else
                     MessageBox.Show("Le password non coincidono. Riprova !");
@@ -63,15 +66,14 @@ namespace Client
         private void btn_switch_login_Click(object sender, EventArgs e)
         {
             listener.Stop();
-            client.Close();
-            tcpListenerThread.Abort();
+            ///tcpListenerThread.Abort();
             this.DialogResult = DialogResult.Yes;
             this.Close();
         }
 
         private void StartTcpListenerThread()
         {
-            listener = new TcpListener(IPAddress.Any, server_port);
+            
             TcpClient client = null;
             listener.Start();
             
@@ -93,6 +95,7 @@ namespace Client
                         }
                         else if(len!=0)
                         {
+                            MessageBox.Show("Registrazione effettuata !");
                             List<ircUser> online_users = (List<ircUser>)ircMessage.BytesToObj(buffer,len);
                             listener.Stop();
                             loop = false;

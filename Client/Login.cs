@@ -17,25 +17,27 @@ namespace Client
     public partial class Login : Form
     {
         string server_addr;
-        int server_port = 7777;
+        static int server_port = 7777;
         TcpClient client;
         Thread tcpListenerThread = null; //thread listener per client
-        List<ircUser> online_users = null; /// lista di utenti
-        TcpListener listener = null;
+        List<ircUser> online_users = new List<ircUser>(); /// lista di utenti
+        TcpListener listener = new TcpListener(IPAddress.Any, server_port);
+        bool server_response = false; //controlla se server risponde
 
         public Login(string myServer_addr)
         {          
             InitializeComponent();
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
-            StartTcpListenerThread(); //start client listener
+            
         }
 
         private void btn_login_Click(object sender, EventArgs e)
         {
             try
             {
-               
+                StartTcpListenerThread(); //start client listener
+
                 client = new TcpClient(server_addr, server_port);
                 
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
@@ -46,13 +48,19 @@ namespace Client
                 stream.Close();
                 client.Close();
                 
-                /*if (!tcpListenerThread.IsAlive)
+                
+                while (true)
                 {
-                    Form myHome = new Home(server_addr, online_users);
-                    this.Hide();
-                    myHome.ShowDialog();
-                    this.Close();
-                }*/
+                    if (server_response != false)
+                    {
+                        MessageBox.Show("Home Apertura");
+                        Form myHome = new Home(server_addr, online_users);
+                        this.Hide();
+                        myHome.ShowDialog();
+                        this.Close();
+                        break;
+                    }
+                }
 
                 /*
                 int msgLenght = Encoding.ASCII.GetByteCount("Richiedo Login");  //lunghezza in byte del messaggio 
@@ -74,10 +82,9 @@ namespace Client
         private void btn_switch_reg_Click(object sender, EventArgs e)
         {
             try
-            {               
-                listener.Stop();
-                client.Close();
-                tcpListenerThread.Abort();
+            {
+                listener.Stop();             
+                //tcpListenerThread.Abort();
                 this.DialogResult = DialogResult.Yes; //messaggio che ritorna la finestra dialogo se si vuole fare switch
                 this.Close();
             }
@@ -89,7 +96,7 @@ namespace Client
 
         private void StartTcpListenerThread()
         {
-            listener = new TcpListener(IPAddress.Any, server_port);
+            //listener = new TcpListener(IPAddress.Any, server_port);
             TcpClient client = null;            
             listener.Start();
            
@@ -105,18 +112,20 @@ namespace Client
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
-                        
+                       
                         if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0)
                         {
                             MessageBox.Show("Invalid Login !");                           
                         }
-                        else if (len != 0)
+                        else 
                         {
+                            MessageBox.Show("Login effettuato !");                           
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                             listener.Stop();
                             loop = false;
+                            server_response = true; //server risponde quindi si modifica variabile per aprire form home
                         }
-                        len = 0;
+                        
                         stream.Close();
                         client.Close();
                     }
@@ -127,7 +136,7 @@ namespace Client
                 }
             });
 
-            tcpListenerThread.IsBackground = true;
+            //tcpListenerThread.IsBackground = true;
             tcpListenerThread.Start();
         }
     }
