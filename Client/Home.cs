@@ -53,7 +53,7 @@ namespace Client
             Button partner_button = sender as Button;
             string receiverUsername = ((ircUser)partner_button.Tag).username;
             //Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(receiverUsername)).FirstOrDefault();
-            ircMessage newMessage = new ircMessage(current_user.username, receiverUsername, null, 2);
+            ircMessage newMessage = new ircMessage(receiverUsername, current_user.username, 2);
 
             //Se non esistono ancora chat aperte OPPURE se non esistono chat dal sender (Ridondante, basterebbe il chatThread)
             //if (chatThread.Equals(null)) {
