@@ -45,7 +45,9 @@ namespace Client
         ///     List<ircUser> contenente gli utenti online
         /// </param>
         void LoadContacts(List<ircUser> users) {
+
             foreach (ircUser user in users) {
+                flp_contacts.Controls.Clear();
                 if (user.username != current_user.username)
                 {
                     Panel panel = new Panel
@@ -131,22 +133,18 @@ namespace Client
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
-
-
-                        online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-                        MessageBox.Show($"List dimension : {online_users.Count}");
-
-                        /*
-                        if ((ircMessage)ircMessage.BytesToObj(buffer, len) != null)
+                        
+                        try
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
                             MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
                         }
-                        else if ((List<ircUser>)ircMessage.BytesToObj(buffer, len) != null)
+                        catch
                         {
-                            MessageBox.Show($"Arrivato una lista di utenti");
-                        }*/
-
+                            online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                            MessageBox.Show($"Users Online : {online_users.Count}");
+                            //Invoke(LoadContacts(online_users));
+                        }
                     }
                     catch (Exception e)
                     {
