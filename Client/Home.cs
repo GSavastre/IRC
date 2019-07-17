@@ -60,11 +60,11 @@ namespace Client
 
                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                 try {
-                    Thread chatThread = new Thread(() => UpdateChat(newMessage));
+                    Thread chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
                     chatThread.Name = receiverUsername;
-                    chatThread.IsBackground = true;
+                    //chatThread.IsBackground = true;
                     chatThreads.Add(chatThread);
-                    chatThread.Start();
+                    chatThread.Start(newMessage);
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message, $"Errore nella creazione della chat");
                 }
@@ -125,7 +125,7 @@ namespace Client
                             #endregion
 
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                            MessageBox.Show($"Ricevuto {newMessage.message} da {newMessage.sender_username}");
+                            //MessageBox.Show($"Ricevuto {newMessage.message} da {newMessage.sender_username}");
 
                             //Ottengo il thread che abbia il nome del sender, può ritornare null in caso non ci sia tale thread
                             Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(newMessage.sender_username)).FirstOrDefault();
@@ -135,9 +135,10 @@ namespace Client
 
                                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                                 try {
-                                    chatThread = new Thread(() => UpdateChat(newMessage));
+                                    //chatThread = new Thread(() => UpdateChat(newMessage));
+                                    chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
                                     chatThread.Name = newMessage.sender_username;
-                                    chatThread.IsBackground = true;
+                                    //chatThread.IsBackground = true;
 
                                     chatThreads.Add(chatThread);
                                 } catch (Exception ex) {
@@ -149,7 +150,8 @@ namespace Client
                             if (chatThread.Equals(null)) {
                                 MessageBox.Show($"Errore nel recupero della chat dall'utente {newMessage.sender_username}");
                             } else {
-                                chatThread.Start();
+                                //chatThread.Abort();
+                                chatThread.Start(newMessage);
                             }
 
 
@@ -209,7 +211,9 @@ namespace Client
             MessageBox.Show("Chiusura Form Home");
         }
         
-        public void UpdateChat(ircMessage message) {
+        public void UpdateChat(object obj) {
+
+            ircMessage message = (ircMessage)obj;
 
             Chat chat;
 
@@ -221,11 +225,13 @@ namespace Client
                 chat = (Chat)Application.OpenForms[message.sender_username];
             }
 
-            if (message.message != null) {
-                chat.AddMessage(message.message);
-            }
+            if (chat != null) {
+                if (message.message != null) {
+                    chat.AddMessage(message.message);
+                }
 
-            chat.ShowDialog();
+                chat.ShowDialog();
+            }
         }
 
         /// <summary>
