@@ -64,20 +64,21 @@ namespace Client
                         }
                         else
                         {
+
+                            listener.Stop();
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                                 
                             streamlistener.Close();
                             clientlistener.Close();
 
                             Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
-
+                            
                             this.Hide();
                             home.ShowDialog();
                             this.Close();
                             break;
                         }
                     }
-                    listener.Stop();
                     
 
                 }

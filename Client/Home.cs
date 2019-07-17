@@ -22,6 +22,7 @@ namespace Client
         public static ircUser current_user;
         List<ircUser> online_users = null;
 
+        TcpListener listener = null;
         Thread tcpListenerThread = null;
 
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
@@ -34,7 +35,7 @@ namespace Client
             l_user.Text = current_user.username;
 
             LoadContacts(online_users);
-            //StartTcpListenerThread();
+            StartTcpListenerThread();
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace Client
 
         private void StartTcpListenerThread()
         {
-            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
             tcpListenerThread = new Thread(() =>
@@ -139,17 +140,7 @@ namespace Client
                         else if ((List<ircUser>)ircMessage.BytesToObj(buffer, len) != null)
                         {
 
-                        }
-
-                        /*
-                        ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                        MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
-                        
-                        
-                         * TODO*
-                         * -Controllo da chi arriva il messaggio
-                         * -Mostro messaggio in chat corrispondente
-                         */
+                        }                        
                     }
                     catch (Exception e)
                     {
@@ -174,6 +165,10 @@ namespace Client
 
                 stream.Close();
                 client.Close();
+                listener.Stop();
+                tcpListenerThread.Abort();
+
+
                 this.Close();
             }
             catch(Exception ex)
@@ -182,11 +177,20 @@ namespace Client
                 stream.Close();
                 client.Close();
             }
+
+            
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            tcpListenerThread.Abort();
             Application.Exit();
+        }
+
+        private void Home_Closing(object sender, CancelEventArgs e)
+        {
+            MessageBox.Show("Chiusura Form Home");
         }
     }
 }

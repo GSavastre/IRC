@@ -141,7 +141,12 @@ namespace Client {
                 }
 
                 discoveryThread.Resume();   //riattiviamo il thread se torniamo qui
-                this.Show();
+                try
+                {
+                    this.Show();
+                }
+                catch {}
+                    
             }
         }
 
