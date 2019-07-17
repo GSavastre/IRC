@@ -74,6 +74,7 @@ namespace Server
                         case 1: //Login
                             Console.WriteLine("LOGIN_USER_REQUEST Received");
                             Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
+                            UpdateOnlineUsers();
                             break;
                         case 2: //Message
                             Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
