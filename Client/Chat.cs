@@ -15,21 +15,20 @@ namespace Client
         string server_addr;
         const int port = 7777;
         TcpClient client = null;
-        ircUser partner = null;
+        string partner_username ;
 
-        public Chat(ircUser myPartner, string myServer_addr)
+        public Chat(string myPartner, string myServer_addr)
         {
             InitializeComponent();
             server_addr = myServer_addr;
-            partner = myPartner;
-            l_partner.Text = partner.username;
+            partner_username = myPartner;
         }
 
         private void btn_test_Click(object sender, EventArgs e)
         {
             client = new TcpClient(server_addr, port);
 
-            ircMessage msg = new ircMessage(Home.current_user.username , partner.username , tb_msg.Text, 2);
+            ircMessage msg = new ircMessage(Home.current_user.username , partner_username , tb_msg.Text, 2);
 
             NetworkStream stream = client.GetStream();
             stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);

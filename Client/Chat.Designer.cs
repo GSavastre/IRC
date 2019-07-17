@@ -31,8 +31,6 @@
             this.tb_msg = new System.Windows.Forms.TextBox();
             this.btn_send = new System.Windows.Forms.Button();
             this.lb_chat = new System.Windows.Forms.ListBox();
-            this.l_partner = new System.Windows.Forms.Label();
-            this.l_chatting_with = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // tb_msg
@@ -56,43 +54,23 @@
             // lb_chat
             // 
             this.lb_chat.FormattingEnabled = true;
-            this.lb_chat.Location = new System.Drawing.Point(12, 29);
+            this.lb_chat.Location = new System.Drawing.Point(12, 16);
             this.lb_chat.Name = "lb_chat";
-            this.lb_chat.Size = new System.Drawing.Size(361, 186);
+            this.lb_chat.Size = new System.Drawing.Size(361, 199);
             this.lb_chat.TabIndex = 2;
-            // 
-            // l_partner
-            // 
-            this.l_partner.AutoSize = true;
-            this.l_partner.Location = new System.Drawing.Point(95, 10);
-            this.l_partner.Name = "l_partner";
-            this.l_partner.Size = new System.Drawing.Size(35, 13);
-            this.l_partner.TabIndex = 3;
-            this.l_partner.Text = "label1";
-            // 
-            // l_chatting_with
-            // 
-            this.l_chatting_with.AutoSize = true;
-            this.l_chatting_with.Location = new System.Drawing.Point(12, 10);
-            this.l_chatting_with.Name = "l_chatting_with";
-            this.l_chatting_with.Size = new System.Drawing.Size(77, 13);
-            this.l_chatting_with.TabIndex = 4;
-            this.l_chatting_with.Text = "Chatting with : ";
             // 
             // Chat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(385, 299);
-            this.Controls.Add(this.l_chatting_with);
-            this.Controls.Add(this.l_partner);
             this.Controls.Add(this.lb_chat);
             this.Controls.Add(this.btn_send);
             this.Controls.Add(this.tb_msg);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Chat";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "unknow";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -103,8 +81,6 @@
         private System.Windows.Forms.TextBox tb_msg;
         private System.Windows.Forms.Button btn_send;
         private System.Windows.Forms.ListBox lb_chat;
-        private System.Windows.Forms.Label l_partner;
-        private System.Windows.Forms.Label l_chatting_with;
     }
 }
 

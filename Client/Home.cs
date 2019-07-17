@@ -25,7 +25,7 @@ namespace Client
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
-        
+        List<Chat> chatList = new List<Chat>();
 
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
@@ -116,8 +116,7 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            ircUser partner = new ircUser(((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
-            Form chat = new Chat(partner, server_addr);
+            Form chat = new Chat(((ircUser)partner_button.Tag).username, server_addr);
             chat.Show();
         }
 
@@ -141,7 +140,18 @@ namespace Client
                         try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                            MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
+                            foreach (Chat chat in chatList) {
+                                if (chat.Text == newMessage.sender_username)
+                                {
+                                    //chat.add message
+                                }
+                                else
+                                {
+                                    Chat newChat = new Chat(newMessage.sender_username, server_addr);
+                                    newChat.Show();
+                                    chatList.Add(newChat);
+                                }
+                            }
                         }
                         catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
                         {   
