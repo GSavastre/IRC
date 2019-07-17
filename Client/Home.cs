@@ -27,6 +27,9 @@ namespace Client
 
         List<Chat> chatList = new List<Chat>();
 
+        IList<Thread> chatThreads;
+        List<string> chatNames;
+
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
             InitializeComponent();
@@ -35,6 +38,9 @@ namespace Client
             online_users = myOnline_users;
             
             l_user.Text = current_user.username;
+
+            chatThreads = new List<Thread>();
+            chatNames = new List<string>();
 
             LoadContacts();
             StartTcpListenerThread();
@@ -139,7 +145,8 @@ namespace Client
                         
                         try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
                         {
-                            ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                            #region oldChatSync
+                            /*ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
                             if (chatList.Count != 0)
                             {
                                 foreach (Chat chat in chatList)
@@ -162,11 +169,38 @@ namespace Client
                                 newChat.AddMessage(newMessage.message);
                                 newChat.ShowDialog();
                                 chatList.Add(newChat);
+                            }*/
+                            #endregion
+
+                            ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+
+                            //Ottengo il thread che abbia il nome del sender, può ritornare null in caso non ci sia tale thread
+                            Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(newMessage.sender_username)).FirstOrDefault();
+
+                            //Se non esistono ancora chat aperte OPPURE se non esistono chat dal sender (Ridondante, basterebbe il chatThread)
+                            if (chatThreads.Count == 0 || chatThread.Equals(null)) {
+
+                                //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
+                                try {
+                                    Thread newChatThread = new Thread(() => UpdateChat(newMessage));
+                                    newChatThread.Name = newMessage.sender_username;
+
+                                    chatThreads.Add(newChatThread);
+                                } catch (Exception ex) {
+                                    MessageBox.Show(ex.Message,$"Errore nella creazione della chat");
+                                }
                             }
-                            
-                        }
-                        catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
-                        {   
+
+                            //Eseguo il thread che abbia come nome sender_username
+                            if (chatThread.Equals(null)) {
+                                MessageBox.Show($"Errore nel recupero della chat dall'utente {newMessage.sender_username}");
+                            } else {
+                                chatThread.Start(newMessage);
+                            }
+
+
+                        } catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
+                        {
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                             Invoke(contactsCallback);       //uso invoke perche devo chiamare il metodo LoadContacts che e' sul main thread
                         }
@@ -197,7 +231,6 @@ namespace Client
                 listener.Stop();
                 tcpListenerThread.Abort();
 
-
                 this.Close();
             }
             catch(Exception ex)
@@ -222,5 +255,17 @@ namespace Client
             MessageBox.Show("Chiusura Form Home");
         }
         
+        public void UpdateChat(ircMessage message) {
+
+            Chat chat;
+
+            if (!chatNames.Contains(message.sender_username)) {
+                chat = new Chat(message.sender_username, server_addr);
+            } else {
+                chat = (Chat)Application.OpenForms[message.sender_username];
+            }
+
+            chat.AddMessage(message.message);
+        }
     }
 }

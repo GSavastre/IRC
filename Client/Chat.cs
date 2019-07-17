@@ -40,7 +40,7 @@ namespace Client
                 NetworkStream stream = client.GetStream();
                 stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
 
-                lb_chat.Items.Add(msg.message);
+                lb_chat.Items.Add($"Tu: {msg.message}");
 
                 tb_msg.Text = ""; //Ripulisce casella di scrittura del form
                 stream.Close();
@@ -53,7 +53,7 @@ namespace Client
         }
 
         public void AddMessage(string message) {
-            lb_chat.Items.Add(partner_username + " : " + message);
+            lb_chat.Items.Add(partner_username + ": " + message);
             MessageBox.Show("added " + message);
         }
     }
