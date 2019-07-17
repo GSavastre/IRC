@@ -44,7 +44,7 @@ namespace Client
         /// <param users="Lista di Utenti online">
         ///     List<ircUser> contenente gli utenti online
         /// </param>
-        void LoadContacts(List<ircUser> users) {
+        private void LoadContacts(List<ircUser> users) {
 
             foreach (ircUser user in users) {
                 flp_contacts.Controls.Clear();
@@ -123,6 +123,7 @@ namespace Client
             listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
+            LoadContactsCallback callback = new LoadContactsCallback(LoadContacts);
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -142,8 +143,7 @@ namespace Client
                         catch
                         {
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-                            MessageBox.Show($"Users Online : {online_users.Count}");
-                            //Invoke(LoadContacts(online_users));
+                            Invoke(callback, online_users);
                         }
                     }
                     catch (Exception e)
@@ -196,5 +196,7 @@ namespace Client
         {
             MessageBox.Show("Chiusura Form Home");
         }
+
+        delegate void LoadContactsCallback(List<ircUser> online_users);
     }
 }
