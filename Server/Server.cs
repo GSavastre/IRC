@@ -58,12 +58,7 @@ namespace Server
                     NetworkStream stream = client.GetStream();
 
                     int len = stream.Read(buffer, 0, buffer.Length);
-                    /*
-                    byte[] newBuffer = new byte[len];
-                    for (int i = 0; i < len; i++) {
-                        newBuffer[i] = buffer[i];
-                    }*/
-
+                    
                     ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
                     string senderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                     switch (msg.action) {
@@ -160,7 +155,7 @@ namespace Server
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
                         Console.WriteLine("Login avvenuto con succceso per " + username);
-                        onlineUsers.Add(new ircUser((int)result.Rows[0]["user_id"], username, address));
+                        onlineUsers.Add(new ircUser(username, address));
                         return onlineUsers;
                     } else {
                         Console.WriteLine($"Login fallito per {username}");

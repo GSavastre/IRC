@@ -27,7 +27,7 @@ namespace Client
             InitializeComponent();
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
-            
+            listener.Start();
         }
 
         private void btn_login_Click(object sender, EventArgs e)
@@ -36,7 +36,7 @@ namespace Client
             {
                 client = new TcpClient(server_addr, server_port);
 
-                listener.Start();
+                //listener.Start();
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
                 NetworkStream stream = client.GetStream();
@@ -64,21 +64,21 @@ namespace Client
                         }
                         else
                         {
-                            MessageBox.Show("Login effettuato !");
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                                 
                             streamlistener.Close();
                             clientlistener.Close();
-    
-                            MessageBox.Show("Home Apertura");
-                            Form myHome = new Home(server_addr, online_users);
-    
+
+                            Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
+
                             this.Hide();
-                            myHome.ShowDialog();
+                            home.ShowDialog();
                             this.Close();
                             break;
                         }
                     }
+                    listener.Stop();
+                    
 
                 }
                 catch (Exception ex)
