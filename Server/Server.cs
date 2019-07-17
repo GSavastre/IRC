@@ -186,7 +186,7 @@ namespace Server
                     return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
-                        Console.WriteLine("Login avvenuto con succceso per " + username);
+                        Console.WriteLine("Login avvenuto con successo per " + username);
                         onlineUsers.Add(new ircUser(username, address));
                         return onlineUsers;
                     } else {

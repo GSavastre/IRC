@@ -22,21 +22,23 @@ namespace Client
         List<ircUser> online_users = new List<ircUser>(); /// lista di utenti
         TcpListener listener = new TcpListener(IPAddress.Any, server_port);
 
+        delegate void CloseFormCallback();
+
         public Login(string myServer_addr)
         {          
             InitializeComponent();
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
-            listener.Start();
         }
 
         private void btn_login_Click(object sender, EventArgs e)
         {
+            
             try
             {
+                listener.Start();
                 client = new TcpClient(server_addr, server_port);
 
-                //listener.Start();
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
                 NetworkStream stream = client.GetStream();
@@ -47,48 +49,37 @@ namespace Client
 
                 try
                 {
-                    while (true)
-                    {
-                        TcpClient clientlistener;
-                        clientlistener = listener.AcceptTcpClient();
-                        byte[] buffer = new byte[1024];
-                        NetworkStream streamlistener = clientlistener.GetStream();
-                        int len = streamlistener.Read(buffer, 0, buffer.Length);
-    
-                        if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0)
-                        {
-                            MessageBox.Show("Invalid Login !");
-                            streamlistener.Close();
-                            clientlistener.Close();
-                            break;
-                        }
-                        else
-                        {
-                            online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-                                
-                            streamlistener.Close();
-                            clientlistener.Close();
+                    TcpClient clientlistener;
+                    byte[] buffer = new byte[1024];
+                    clientlistener = listener.AcceptTcpClient();
+                    NetworkStream streamlistener = clientlistener.GetStream();
+                    int len = streamlistener.Read(buffer, 0, buffer.Length);
 
-                            Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
+                    if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0) {
+                        MessageBox.Show("Invalid Login !");
+                        listener.Stop();
+                        streamlistener.Close();
+                        clientlistener.Close();
+                    } else {
 
-                            this.Hide();
-                            home.ShowDialog();
-                            this.Close();
-                            break;
-                        }
+                        online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                        listener.Stop();
+                        streamlistener.Close();
+                        clientlistener.Close();
+
+                        Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
+
+                        this.Hide();
+                        home.ShowDialog();
+                        this.Close();
                     }
-                    listener.Stop();
-                    
-
+                } catch{
+                    MessageBox.Show("Connessione al server scaduta, ritorno alla lista di server disponibili.","Errore connessione al server");
+                    this.Close();
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
+            } catch {
+                MessageBox.Show("Connessione al server scaduta, ritorno alla lista di server disponibili.", "Errore connessione al server");
+                this.Close();
             }
         }
 
