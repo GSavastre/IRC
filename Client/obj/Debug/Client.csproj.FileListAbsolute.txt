@@ -111,3 +111,4 @@ C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.CoreCompile
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.csproj.CopyComplete
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.exe
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.pdb
+C:\Users\cosmi\Documents\Uni\Reti\IRC\Client\obj\Debug\Client.Chat.resources

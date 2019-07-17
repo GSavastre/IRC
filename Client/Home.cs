@@ -140,18 +140,30 @@ namespace Client
                         try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                            foreach (Chat chat in chatList) {
-                                if (chat.Text == newMessage.sender_username)
+                            if (chatList.Count != 0)
+                            {
+                                foreach (Chat chat in chatList)
                                 {
-                                    //chat.add message
-                                }
-                                else
-                                {
-                                    Chat newChat = new Chat(newMessage.sender_username, server_addr);
-                                    newChat.Show();
-                                    chatList.Add(newChat);
+                                    if (chat.Text == newMessage.sender_username)
+                                    {
+                                        chat.AddMessage(newMessage.message);
+                                    }
+                                    else
+                                    {
+                                        Chat newChat = new Chat(newMessage.sender_username, server_addr);
+                                        newChat.Show();
+                                        newChat.AddMessage(newMessage.message);
+                                        chatList.Add(newChat);
+                                    }
                                 }
                             }
+                            else {
+                                Chat newChat = new Chat(newMessage.sender_username, server_addr);
+                                newChat.AddMessage(newMessage.message);
+                                newChat.ShowDialog();
+                                chatList.Add(newChat);
+                            }
+                            
                         }
                         catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
                         {   

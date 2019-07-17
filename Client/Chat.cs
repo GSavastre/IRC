@@ -22,22 +22,39 @@ namespace Client
             InitializeComponent();
             server_addr = myServer_addr;
             partner_username = myPartner;
+            this.Text = partner_username;
+        }
+
+        public Chat() {
+            InitializeComponent();
         }
 
         private void btn_test_Click(object sender, EventArgs e)
         {
-            client = new TcpClient(server_addr, port);
+            try
+            {
+                client = new TcpClient(server_addr, port);
 
-            ircMessage msg = new ircMessage(Home.current_user.username , partner_username , tb_msg.Text, 2);
+                ircMessage msg = new ircMessage(Home.current_user.username, partner_username, tb_msg.Text, 2);
 
-            NetworkStream stream = client.GetStream();
-            stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
+                NetworkStream stream = client.GetStream();
+                stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
 
-            lb_chat.Items.Add(msg.message);
+                lb_chat.Items.Add(msg.message);
 
-            tb_msg.Text = ""; //Ripulisce casella di scrittura del form
-            stream.Close();
-            client.Close();
+                tb_msg.Text = ""; //Ripulisce casella di scrittura del form
+                stream.Close();
+                client.Close();
+            }
+            catch (Exception ex) {
+                MessageBox.Show("Chat send exception : " + ex.Message);
+            }
+            
+        }
+
+        public void AddMessage(string message) {
+            lb_chat.Items.Add(partner_username + " : " + message);
+            MessageBox.Show("added " + message);
         }
     }
 }
