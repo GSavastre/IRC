@@ -38,7 +38,6 @@ namespace Client
             {
                 client = new TcpClient(server_addr, server_port);
 
-                //listener.Start();
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
                 NetworkStream stream = client.GetStream();
@@ -68,7 +67,7 @@ namespace Client
                         {
 
                             listener.Stop();
-                            pingServerThread.Start();
+                           // pingServerThread.Start();
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                                 
                             streamlistener.Close();
@@ -130,12 +129,12 @@ namespace Client
                         tcpClient.Connect(server_addr, server_port);
                         tcpClient.Close();
                     } catch (Exception) {
-                        MessageBox.Show("Connessione al server scaduta, ritorno alla scelta dei server disponibili","Avviso connessione server");
+                        MessageBox.Show("Connessione al server scaduta, ritorno alla scelta dei server disponibili", "Avviso connessione server");
                         this.Close();
                     }
                 }
             } else {
-                MessageBox.Show("Errore nella connessione al server, ritorno alla ricerca di server disponibili...","Avviso connessione server");
+                MessageBox.Show("Errore nella connessione al server, ritorno alla ricerca di server disponibili...", "Avviso connessione server");
                 this.Close();
             }
         }
