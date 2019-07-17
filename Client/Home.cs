@@ -122,7 +122,6 @@ namespace Client
             listener.Start();
             tcpListenerThread = new Thread(() =>
             {
-                tcpListenerThread.IsBackground = true;
                 while (true)
                 {
                     try
@@ -132,10 +131,21 @@ namespace Client
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
 
+                        if ((ircMessage)ircMessage.BytesToObj(buffer, len) != null)
+                        {
+                            ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                            MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
+                        }
+                        else if ((List<ircUser>)ircMessage.BytesToObj(buffer, len) != null)
+                        {
+
+                        }
+
+                        /*
                         ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
                         MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
                         
-                        /*
+                        
                          * TODO*
                          * -Controllo da chi arriva il messaggio
                          * -Mostro messaggio in chat corrispondente

@@ -73,6 +73,7 @@ namespace Server
                             break;
                         case 2: //Message
                             Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
+                            RedirectData(msg);
                             break;
                         case 3: //Logout
                             Console.WriteLine("LOGOUT_REQUEST received");
