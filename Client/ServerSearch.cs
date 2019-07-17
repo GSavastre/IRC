@@ -16,6 +16,7 @@ namespace Client {
     public partial class ServerSearch : Form {
 
         Thread discoveryThread;
+        Login loginForm;
 
         delegate void AddToListCallback(string text);
 
@@ -124,24 +125,26 @@ namespace Client {
                 discoveryThread.Suspend(); //sospendiamo il thread
 
                 this.Hide();
-                Form loginForm = new Login(selectedServerIp);
+                loginForm = new Login(selectedServerIp);
                 Form regForm;
                 bool loop = true;
-                while (loop)
-                {
-                    if (loginForm.ShowDialog() == DialogResult.Yes)
-                    {
+                while (loop) {
+                    if (loginForm.ShowDialog() == DialogResult.Yes) {
                         regForm = new Register(selectedServerIp);
-                        if (regForm.ShowDialog() == DialogResult.Yes) { }
-                        else
+                        if (regForm.ShowDialog() != DialogResult.Yes) {
                             loop = false;
-                    }
-                    else
+                        }
+                    } else { 
                         loop = false;
+                    }
                 }
-
                 discoveryThread.Resume();   //riattiviamo il thread se torniamo qui
-                this.Show();
+                try
+                {
+                    this.Show();
+                }
+                catch {}
+                    
             }
         }
 

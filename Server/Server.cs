@@ -78,6 +78,7 @@ namespace Server
                             break;
                         case 2: //Message
                             Console.WriteLine("MESSAGE received from " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
+                            RedirectData(msg);
                             break;
                         case 3: //Logout
                             Console.WriteLine("LOGOUT_REQUEST received");
@@ -187,7 +188,7 @@ namespace Server
                     return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
-                        Console.WriteLine("Login avvenuto con succceso per " + username);
+                        Console.WriteLine("Login avvenuto con successo per " + username);
                         onlineUsers.Add(new ircUser(username, address));
                         return onlineUsers;
                     } else {
