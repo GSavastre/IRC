@@ -172,7 +172,7 @@ namespace Server
 
         private List<ircUser> Login(string username, string password, string address) {
 
-            Console.WriteLine($"Inizio processo di login per {username}");
+            Console.WriteLine($"Inizio processo di login per {username}:{password}");
 
             //Ricerco se l'utente è già presente nella lista di utenti online su questo server
             ircUser loggedUser = onlineUsers.Where(user => user.username.Equals(username)).FirstOrDefault();
@@ -187,7 +187,7 @@ namespace Server
                     return new List<ircUser>();
                 } else {
                     if (Crypto.VerifyHashedPassword(result.Rows[0]["password"].ToString(), password)) {
-                        Console.WriteLine("Login avvenuto con succceso per " + username);
+                        Console.WriteLine("Login avvenuto con successo per " + username);
                         onlineUsers.Add(new ircUser(username, address));
                         return onlineUsers;
                     } else {
