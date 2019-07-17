@@ -54,7 +54,7 @@ namespace Client
 
         public void AddMessage(string message) {
             lb_chat.Items.Add(partner_username + ": " + message);
-            MessageBox.Show("added " + message);
+            //MessageBox.Show("added " + message);
         }
     }
 }

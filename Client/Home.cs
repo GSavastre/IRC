@@ -53,7 +53,7 @@ namespace Client
             Button partner_button = sender as Button;
             string receiverUsername = ((ircUser)partner_button.Tag).username;
             //Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(receiverUsername)).FirstOrDefault();
-            ircMessage newMessage = new ircMessage(receiverUsername, current_user.username, 2);
+            ircMessage newMessage = new ircMessage(receiverUsername, current_user.username,null, 2);
 
             //Se non esistono ancora chat aperte OPPURE se non esistono chat dal sender (Ridondante, basterebbe il chatThread)
             //if (chatThread.Equals(null)) {
@@ -125,6 +125,7 @@ namespace Client
                             #endregion
 
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                            MessageBox.Show($"Ricevuto {newMessage.message} da {newMessage.sender_username}");
 
                             //Ottengo il thread che abbia il nome del sender, può ritornare null in caso non ci sia tale thread
                             Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(newMessage.sender_username)).FirstOrDefault();
@@ -215,6 +216,7 @@ namespace Client
 
             if (!chatNames.Contains(message.sender_username)) {
                 chat = new Chat(message.sender_username, server_addr);
+                chatNames.Add(message.sender_username);
             } else {
                 chat = (Chat)Application.OpenForms[message.sender_username];
             }
