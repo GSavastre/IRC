@@ -21,6 +21,7 @@ namespace Client
         TcpClient client;
         List<ircUser> online_users = new List<ircUser>(); /// lista di utenti
         TcpListener listener = new TcpListener(IPAddress.Any, server_port);
+        Thread pingServerThread;
 
         public Login(string myServer_addr)
         {          
@@ -28,6 +29,7 @@ namespace Client
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
             listener.Start();
+            pingServerThread = new Thread(new ThreadStart(PingServer));
         }
 
         private void btn_login_Click(object sender, EventArgs e)
@@ -64,6 +66,9 @@ namespace Client
                         }
                         else
                         {
+
+                            listener.Stop();
+                            pingServerThread.Start();
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                                 
                             streamlistener.Close();
@@ -77,7 +82,6 @@ namespace Client
                             break;
                         }
                     }
-                    listener.Stop();
                     
 
                 }
@@ -103,6 +107,36 @@ namespace Client
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        public void StopServerPingThread() {
+            try {
+                pingServerThread.Interrupt();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Errore interruzione del thread per ping al server");
+            } finally {
+                pingServerThread.Abort();
+            }
+            
+        }
+
+        private void PingServer() {
+            if (!string.IsNullOrEmpty(server_addr)) {
+                TcpClient tcpClient = new TcpClient();
+
+                while (true) {
+                    try {
+                        tcpClient.Connect(server_addr, server_port);
+                        tcpClient.Close();
+                    } catch (Exception) {
+                        MessageBox.Show("Connessione al server scaduta, ritorno alla scelta dei server disponibili","Avviso connessione server");
+                        this.Close();
+                    }
+                }
+            } else {
+                MessageBox.Show("Errore nella connessione al server, ritorno alla ricerca di server disponibili...","Avviso connessione server");
+                this.Close();
             }
         }
     }
