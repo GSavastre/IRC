@@ -25,9 +25,8 @@ namespace Client
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
-        delegate void LoadContactsCallback(List<ircUser> online_users);
-
         
+
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
             InitializeComponent();
@@ -37,7 +36,7 @@ namespace Client
             
             l_user.Text = current_user.username;
 
-            LoadContacts(online_users);
+            LoadContacts();
             StartTcpListenerThread();
         }
 
@@ -47,11 +46,9 @@ namespace Client
         /// <param users="Lista di Utenti online">
         ///     List<ircUser> contenente gli utenti online
         /// </param>
-        [STAThread]
-        private void LoadContacts(List<ircUser> users) {
-
-            foreach (ircUser user in users) {
-                flp_contacts.Controls.Clear();
+        private void LoadContacts() {
+            flp_contacts.Controls.Clear();
+            foreach (ircUser user in online_users) {
                 if (user.username != current_user.username)
                 {
                     Panel panel = new Panel
@@ -111,6 +108,8 @@ namespace Client
             }
         }
 
+        delegate void LoadContactsCallback();
+
         /// <summary>
         ///  Handler dinamico per instanziare nuove chat.
         /// </summary>
@@ -127,7 +126,7 @@ namespace Client
             listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
-            LoadContactsCallback callback;
+            LoadContactsCallback contactsCallback = new LoadContactsCallback(LoadContacts);
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -139,26 +138,18 @@ namespace Client
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
                         
-                        try
+                        try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
                             MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
                         }
-                        catch
-                        {
+                        catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
+                        {   
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-                            MessageBox.Show("Arrivato utente metodo " + this.flp_contacts.InvokeRequired);
-                            callback = new LoadContactsCallback(LoadContacts);
-                            if (this.flp_contacts.InvokeRequired)
-                            {
-                                Invoke(callback,new object[] { online_users });
-                            }
-                            else {
-                                LoadContacts(online_users);
-                            }                            
+                            Invoke(contactsCallback);       //uso invoke perche devo chiamare il metodo LoadContacts che e' sul main thread
                         }
                     }
-                    catch (Exception e)
+                    catch 
                     {
                         //MessageBox.Show(e.Message);
                     }
@@ -208,7 +199,6 @@ namespace Client
         {
             MessageBox.Show("Chiusura Form Home");
         }
-
         
     }
 }
