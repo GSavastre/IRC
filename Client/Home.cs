@@ -45,85 +45,37 @@ namespace Client
             LoadContacts();
             StartTcpListenerThread();
         }
-
-        /// <summary>
-        ///  Genere la GUI per la lista di utenti online
-        /// </summary>
-        /// <param users="Lista di Utenti online">
-        ///     List<ircUser> contenente gli utenti online
-        /// </param>
-        private void LoadContacts() {
-            flp_contacts.Controls.Clear();
-            foreach (ircUser user in online_users) {
-                if (user.username != current_user.username)
-                {
-                    Panel panel = new Panel
-                    {
-                        Size = new Size(252, 48)
-                    };
-
-                    Label label_user = new Label
-                    {
-                        Text = user.username,
-                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                        Location = new Point(10, 10),
-                        Size = new Size(70, 16)
-                    };
-
-                    Button btn = new Button
-                    {
-                        Size = new Size(75, 34),
-                        Tag = user,
-                        Text = "Start Chat",
-                        Location = new Point(165, 7)
-                    };
-
-                    btn.Click += new EventHandler(startChat_Button_Click);
-
-                    Button btn_status = new Button
-                    {
-                        Size = new Size(15, 15),
-                        Location = new Point(12, 28),
-                        BackColor = Color.LimeGreen
-                    };
-
-                    Label label_online = new Label
-                    {
-                        Text = "Online",
-                        Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic),
-                        Location = new Point(33, 30),
-                        Size = new Size(37, 13)
-                    };
-
-                    Label sep = new Label
-                    {
-                        AutoSize = false,
-                        Height = 2,
-                        Width = 250,
-                        BorderStyle = BorderStyle.Fixed3D
-                    };
-
-                    panel.Controls.Add(label_user);
-                    panel.Controls.Add(btn);
-                    panel.Controls.Add(btn_status);
-                    panel.Controls.Add(label_online);
-
-                    flp_contacts.Controls.Add(panel);
-                    flp_contacts.Controls.Add(sep);
-                }
-            }
-        }
-
-        delegate void LoadContactsCallback();
-
         /// <summary>
         ///  Handler dinamico per instanziare nuove chat.
         /// </summary>
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            Form chat = new Chat(((ircUser)partner_button.Tag).username, server_addr);
-            chat.Show();
+            string receiverUsername = ((ircUser)partner_button.Tag).username;
+            //Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(receiverUsername)).FirstOrDefault();
+            ircMessage newMessage = new ircMessage(current_user.username, receiverUsername, null, 2);
+
+            //Se non esistono ancora chat aperte OPPURE se non esistono chat dal sender (Ridondante, basterebbe il chatThread)
+            //if (chatThread.Equals(null)) {
+
+                //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
+                try {
+                    Thread chatThread = new Thread(() => UpdateChat(newMessage));
+                    chatThread.Name = receiverUsername;
+                    chatThread.IsBackground = true;
+                    chatThreads.Add(chatThread);
+                    chatThread.Start();
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, $"Errore nella creazione della chat");
+                }
+            //}
+
+            //Eseguo il thread che abbia come nome sender_username
+            /*if (chatThread.Equals(null)) {
+                MessageBox.Show($"Errore nella creazion della chat con l'utente {receiverUsername}");
+            } else {
+                chatThread.Start(null);
+            }*/
         }
 
         private void StartTcpListenerThread()
@@ -182,10 +134,11 @@ namespace Client
 
                                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                                 try {
-                                    Thread newChatThread = new Thread(() => UpdateChat(newMessage));
-                                    newChatThread.Name = newMessage.sender_username;
+                                    chatThread = new Thread(() => UpdateChat(newMessage));
+                                    chatThread.Name = newMessage.sender_username;
+                                    chatThread.IsBackground = true;
 
-                                    chatThreads.Add(newChatThread);
+                                    chatThreads.Add(chatThread);
                                 } catch (Exception ex) {
                                     MessageBox.Show(ex.Message,$"Errore nella creazione della chat");
                                 }
@@ -195,7 +148,7 @@ namespace Client
                             if (chatThread.Equals(null)) {
                                 MessageBox.Show($"Errore nel recupero della chat dall'utente {newMessage.sender_username}");
                             } else {
-                                chatThread.Start(newMessage);
+                                chatThread.Start();
                             }
 
 
@@ -259,13 +212,81 @@ namespace Client
 
             Chat chat;
 
+
             if (!chatNames.Contains(message.sender_username)) {
                 chat = new Chat(message.sender_username, server_addr);
             } else {
                 chat = (Chat)Application.OpenForms[message.sender_username];
             }
 
-            chat.AddMessage(message.message);
+            if (message.message != null) {
+                chat.AddMessage(message.message);
+            }
+
+            chat.ShowDialog();
         }
+
+        /// <summary>
+        ///  Genere la GUI per la lista di utenti online
+        /// </summary>
+        /// <param users="Lista di Utenti online">
+        ///     List<ircUser> contenente gli utenti online
+        /// </param>
+        private void LoadContacts() {
+            flp_contacts.Controls.Clear();
+            foreach (ircUser user in online_users) {
+                if (user.username != current_user.username) {
+                    Panel panel = new Panel {
+                        Size = new Size(252, 48)
+                    };
+
+                    Label label_user = new Label {
+                        Text = user.username,
+                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                        Location = new Point(10, 10),
+                        Size = new Size(70, 16)
+                    };
+
+                    Button btn = new Button {
+                        Size = new Size(75, 34),
+                        Tag = user,
+                        Text = "Start Chat",
+                        Location = new Point(165, 7)
+                    };
+
+                    btn.Click += new EventHandler(startChat_Button_Click);
+
+                    Button btn_status = new Button {
+                        Size = new Size(15, 15),
+                        Location = new Point(12, 28),
+                        BackColor = Color.LimeGreen
+                    };
+
+                    Label label_online = new Label {
+                        Text = "Online",
+                        Font = new Font("Microsoft Sans Serif", 8, FontStyle.Italic),
+                        Location = new Point(33, 30),
+                        Size = new Size(37, 13)
+                    };
+
+                    Label sep = new Label {
+                        AutoSize = false,
+                        Height = 2,
+                        Width = 250,
+                        BorderStyle = BorderStyle.Fixed3D
+                    };
+
+                    panel.Controls.Add(label_user);
+                    panel.Controls.Add(btn);
+                    panel.Controls.Add(btn_status);
+                    panel.Controls.Add(label_online);
+
+                    flp_contacts.Controls.Add(panel);
+                    flp_contacts.Controls.Add(sep);
+                }
+            }
+        }
+
+        delegate void LoadContactsCallback();
     }
 }
