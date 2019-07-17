@@ -133,11 +133,9 @@ namespace Client {
                         regForm = new Register(selectedServerIp);
                         if (regForm.ShowDialog() != DialogResult.Yes) {
                             loop = false;
-                            loginForm.StopServerPingThread();
                         }
                     } else { 
                         loop = false;
-                        loginForm.StopServerPingThread();
                     }
                 }
                 discoveryThread.Resume();   //riattiviamo il thread se torniamo qui

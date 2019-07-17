@@ -21,7 +21,6 @@ namespace Client
         TcpClient client;
         List<ircUser> online_users = new List<ircUser>(); /// lista di utenti
         TcpListener listener = new TcpListener(IPAddress.Any, server_port);
-        Thread pingServerThread;
 
         delegate void CloseFormCallback();
 
@@ -30,14 +29,14 @@ namespace Client
             InitializeComponent();
             server_addr = myServer_addr;
             this.DialogResult = DialogResult.OK;
-            listener.Start();
-            pingServerThread = new Thread(new ThreadStart(PingServer));
         }
 
         private void btn_login_Click(object sender, EventArgs e)
         {
+            
             try
             {
+                listener.Start();
                 client = new TcpClient(server_addr, server_port);
 
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
@@ -50,42 +49,29 @@ namespace Client
 
                 try
                 {
-                    while (true)
-                    {
-                        TcpClient clientlistener;
-                        try {
-                            byte[] buffer = new byte[1024];
-                            clientlistener = listener.AcceptTcpClient();
-                            NetworkStream streamlistener = clientlistener.GetStream();
-                            int len = streamlistener.Read(buffer, 0, buffer.Length);
+                    TcpClient clientlistener;
+                    byte[] buffer = new byte[1024];
+                    clientlistener = listener.AcceptTcpClient();
+                    NetworkStream streamlistener = clientlistener.GetStream();
+                    int len = streamlistener.Read(buffer, 0, buffer.Length);
 
-                            if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0) {
-                                MessageBox.Show("Invalid Login !");
-                                streamlistener.Close();
-                                clientlistener.Close();
-                                break;
-                            } else {
+                    if (((List<ircUser>)ircMessage.BytesToObj(buffer, len)).Count() == 0) {
+                        MessageBox.Show("Invalid Login !");
+                        listener.Stop();
+                        streamlistener.Close();
+                        clientlistener.Close();
+                    } else {
 
-                                listener.Stop();
-                                //pingServerThread.Start();
-                                online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                        online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                        listener.Stop();
+                        streamlistener.Close();
+                        clientlistener.Close();
 
-                                streamlistener.Close();
-                                clientlistener.Close();
+                        Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
 
-                                Form home = new Home(server_addr, new ircUser(tb_log_username.Text, Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString()), online_users);
-
-                                this.Hide();
-                                home.ShowDialog();
-                                this.Close();
-                                break;
-                            }
-                        } catch (Exception) {
-                            MessageBox.Show("Connessione al server scaduta, ritorno alla lista di server disponibili.", "Errore connessione al server");
-                            this.Close();
-                            break;
-                        }
-                       
+                        this.Hide();
+                        home.ShowDialog();
+                        this.Close();
                     }
                 } catch{
                     MessageBox.Show("Connessione al server scaduta, ritorno alla lista di server disponibili.","Errore connessione al server");
@@ -109,44 +95,6 @@ namespace Client
             {
                 MessageBox.Show(ex.ToString());
             }
-        }
-
-        public void StopServerPingThread() {
-            try {
-                pingServerThread.Interrupt();
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message, "Errore interruzione del thread per ping al server");
-            } finally {
-                pingServerThread.Abort();
-            }
-            
-        }
-
-        private void PingServer() {
-
-            CloseFormCallback d = new CloseFormCallback(CloseForm);
-
-            if (!string.IsNullOrEmpty(server_addr)) {
-                
-                while (true) {
-                    TcpClient tcpClient = new TcpClient();
-                    try {
-                        tcpClient.Connect(server_addr, server_port);
-                        tcpClient.Close();
-                    } catch (Exception e) {
-                        MessageBox.Show($"Connessione al server scaduta, ritorno alla scelta dei server disponibili\n{e.Message}", "Avviso connessione server");
-                        
-                        this.Invoke(d);
-                    }
-                }
-            } else {
-                MessageBox.Show("Errore nella connessione al server, ritorno alla ricerca di server disponibili...", "Avviso connessione server");
-                this.Invoke(d);
-            }
-        }
-
-        private void CloseForm() {
-            this.Close();
         }
     }
 }
