@@ -22,6 +22,7 @@ namespace Client
         public static ircUser current_user;
         List<ircUser> online_users = null;
 
+        TcpListener listener = null;
         Thread tcpListenerThread = null;
 
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
@@ -34,7 +35,7 @@ namespace Client
             l_user.Text = current_user.username;
 
             LoadContacts(online_users);
-            //StartTcpListenerThread();
+            StartTcpListenerThread();
         }
 
         /// <summary>
@@ -44,7 +45,9 @@ namespace Client
         ///     List<ircUser> contenente gli utenti online
         /// </param>
         void LoadContacts(List<ircUser> users) {
+
             foreach (ircUser user in users) {
+                flp_contacts.Controls.Clear();
                 if (user.username != current_user.username)
                 {
                     Panel panel = new Panel
@@ -117,12 +120,11 @@ namespace Client
 
         private void StartTcpListenerThread()
         {
-            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
             tcpListenerThread = new Thread(() =>
             {
-                tcpListenerThread.IsBackground = true;
                 while (true)
                 {
                     try
@@ -131,15 +133,18 @@ namespace Client
                         byte[] buffer = new byte[1024];
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
-
-                        ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                        MessageBox.Show(msg.sender_username + " " + msg.message + " " + msg.receiver_username);
                         
-                        /*
-                         * TODO*
-                         * -Controllo da chi arriva il messaggio
-                         * -Mostro messaggio in chat corrispondente
-                         */
+                        try
+                        {
+                            ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                            MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
+                        }
+                        catch
+                        {
+                            online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                            MessageBox.Show($"Users Online : {online_users.Count}");
+                            //Invoke(LoadContacts(online_users));
+                        }
                     }
                     catch (Exception e)
                     {
@@ -164,6 +169,10 @@ namespace Client
 
                 stream.Close();
                 client.Close();
+                listener.Stop();
+                tcpListenerThread.Abort();
+
+
                 this.Close();
             }
             catch(Exception ex)
@@ -172,11 +181,20 @@ namespace Client
                 stream.Close();
                 client.Close();
             }
+
+            
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            tcpListenerThread.Abort();
             Application.Exit();
+        }
+
+        private void Home_Closing(object sender, CancelEventArgs e)
+        {
+            MessageBox.Show("Chiusura Form Home");
         }
     }
 }
