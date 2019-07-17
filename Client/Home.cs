@@ -60,11 +60,34 @@ namespace Client
 
                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                 try {
-                    Thread chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
+                //Thread chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
+                    Thread chatThread = new Thread(() => {
+                        ircMessage message = newMessage;
+
+                        Chat chat;
+
+                        if (!chatNames.Contains(message.sender_username)) {
+                            chat = new Chat(message.sender_username, server_addr);
+                            chatNames.Add(message.sender_username);
+                        } else {
+                            chat = (Chat)Application.OpenForms[message.sender_username];
+                        }
+
+                        if (chat != null) {
+                            if (message.message != null) {
+                                chat.AddMessage(message.message);
+                            }
+                            chat.Refresh();
+                            chat.ShowDialog();
+                        }
+                        Thread.Sleep(100);
+                    });
                     chatThread.Name = receiverUsername;
                     //chatThread.IsBackground = true;
+                    chatThread.Start();
                     chatThreads.Add(chatThread);
-                    chatThread.Start(newMessage);
+                    
+                   // chatThread.Start(newMessage);
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message, $"Errore nella creazione della chat");
                 }
@@ -136,11 +159,32 @@ namespace Client
                                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                                 try {
                                     //chatThread = new Thread(() => UpdateChat(newMessage));
-                                    chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
+                                    //chatThread = new Thread(new ParameterizedThreadStart(UpdateChat));
+                                    chatThread = new Thread(()=> {
+                                        ircMessage message = newMessage;
+
+                                        Chat chat;
+
+                                        if (!chatNames.Contains(message.sender_username)) {
+                                            chat = new Chat(message.sender_username, server_addr);
+                                            chatNames.Add(message.sender_username);
+                                        } else {
+                                            chat = (Chat)Application.OpenForms[message.sender_username];
+                                        }
+
+                                        if (chat != null) {
+                                            if (message.message != null) {
+                                                chat.AddMessage(message.message);
+                                            }
+                                            chat.Refresh();
+                                            chat.ShowDialog();
+                                        }
+                                        Thread.Sleep(100);
+                                    });
                                     chatThread.Name = newMessage.sender_username;
                                     //chatThread.IsBackground = true;
 
-                                    chatThreads.Add(chatThread);
+                                    
                                 } catch (Exception ex) {
                                     MessageBox.Show(ex.Message,$"Errore nella creazione della chat");
                                 }
@@ -152,6 +196,7 @@ namespace Client
                             } else {
                                 //chatThread.Abort();
                                 chatThread.Start(newMessage);
+                                chatThreads.Add(chatThread);
                             }
 
 
