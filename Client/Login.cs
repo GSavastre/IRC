@@ -23,6 +23,8 @@ namespace Client
         TcpListener listener = new TcpListener(IPAddress.Any, server_port);
         Thread pingServerThread;
 
+        delegate void CloseFormCallback();
+
         public Login(string myServer_addr)
         {          
             InitializeComponent();
@@ -67,7 +69,7 @@ namespace Client
                         {
 
                             listener.Stop();
-                           // pingServerThread.Start();
+                            pingServerThread.Start();
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
                                 
                             streamlistener.Close();
@@ -121,22 +123,30 @@ namespace Client
         }
 
         private void PingServer() {
-            if (!string.IsNullOrEmpty(server_addr)) {
-                TcpClient tcpClient = new TcpClient();
 
+            CloseFormCallback d = new CloseFormCallback(CloseForm);
+
+            if (!string.IsNullOrEmpty(server_addr)) {
+                
                 while (true) {
+                    TcpClient tcpClient = new TcpClient();
                     try {
                         tcpClient.Connect(server_addr, server_port);
                         tcpClient.Close();
-                    } catch (Exception) {
-                        MessageBox.Show("Connessione al server scaduta, ritorno alla scelta dei server disponibili", "Avviso connessione server");
-                        this.Close();
+                    } catch (Exception e) {
+                        MessageBox.Show($"Connessione al server scaduta, ritorno alla scelta dei server disponibili\n{e.Message}", "Avviso connessione server");
+                        
+                        this.Invoke(d);
                     }
                 }
             } else {
                 MessageBox.Show("Errore nella connessione al server, ritorno alla ricerca di server disponibili...", "Avviso connessione server");
-                this.Close();
+                this.Invoke(d);
             }
+        }
+
+        private void CloseForm() {
+            this.Close();
         }
     }
 }
