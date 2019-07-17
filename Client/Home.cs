@@ -148,13 +148,13 @@ namespace Client
                             #endregion
 
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                            //MessageBox.Show($"Ricevuto {newMessage.message} da {newMessage.sender_username}");
+                            MessageBox.Show($"Ricevuto {newMessage.message} da {newMessage.sender_username}");
 
                             //Ottengo il thread che abbia il nome del sender, può ritornare null in caso non ci sia tale thread
                             Thread chatThread = chatThreads.Where(thread => thread.Name.Equals(newMessage.sender_username)).FirstOrDefault();
 
                             //Se non esistono ancora chat aperte OPPURE se non esistono chat dal sender (Ridondante, basterebbe il chatThread)
-                            if (chatThreads.Count == 0 || chatThread.Equals(null)) {
+                            if (chatThread == null) {
 
                                 //Messaggio nuovo creo nuovo thread con nuova finestra di chat MA NON LO ESEGUO
                                 try {
