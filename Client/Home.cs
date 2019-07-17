@@ -132,6 +132,11 @@ namespace Client
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
 
+
+                        online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
+                        MessageBox.Show($"List dimension : {online_users.Count}");
+
+                        /*
                         if ((ircMessage)ircMessage.BytesToObj(buffer, len) != null)
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
@@ -139,8 +144,9 @@ namespace Client
                         }
                         else if ((List<ircUser>)ircMessage.BytesToObj(buffer, len) != null)
                         {
+                            MessageBox.Show($"Arrivato una lista di utenti");
+                        }*/
 
-                        }                        
                     }
                     catch (Exception e)
                     {

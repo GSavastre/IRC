@@ -21,7 +21,6 @@ namespace Client
         {
             InitializeComponent();
             server_addr = myServer_addr;
-            lb_chat.Items.Add(server_addr);
             partner = myPartner;
             l_partner.Text = partner.username;
         }

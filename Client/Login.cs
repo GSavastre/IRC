@@ -35,8 +35,7 @@ namespace Client
             try
             {
                 client = new TcpClient(server_addr, server_port);
-
-                //listener.Start();
+                
                 ircMessage regMessage = new ircMessage(tb_log_username.Text, tb_log_password.Text, 1); //oggetto messagge per Login action = 1
 
                 NetworkStream stream = client.GetStream();
