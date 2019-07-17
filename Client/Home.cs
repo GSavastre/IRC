@@ -25,6 +25,9 @@ namespace Client
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
+        delegate void LoadContactsCallback(List<ircUser> online_users);
+
+        
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
             InitializeComponent();
@@ -44,6 +47,7 @@ namespace Client
         /// <param users="Lista di Utenti online">
         ///     List<ircUser> contenente gli utenti online
         /// </param>
+        [STAThread]
         private void LoadContacts(List<ircUser> users) {
 
             foreach (ircUser user in users) {
@@ -123,7 +127,7 @@ namespace Client
             listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
-            LoadContactsCallback callback = new LoadContactsCallback(LoadContacts);
+            LoadContactsCallback callback;
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -143,12 +147,20 @@ namespace Client
                         catch
                         {
                             online_users = (List<ircUser>)ircMessage.BytesToObj(buffer, len);
-                            Invoke(callback, online_users);
+                            MessageBox.Show("Arrivato utente metodo " + this.flp_contacts.InvokeRequired);
+                            callback = new LoadContactsCallback(LoadContacts);
+                            if (this.flp_contacts.InvokeRequired)
+                            {
+                                Invoke(callback,new object[] { online_users });
+                            }
+                            else {
+                                LoadContacts(online_users);
+                            }                            
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        //MessageBox.Show(e.Message);
                     }
                 }
             });
@@ -197,6 +209,6 @@ namespace Client
             MessageBox.Show("Chiusura Form Home");
         }
 
-        delegate void LoadContactsCallback(List<ircUser> online_users);
+        
     }
 }

@@ -273,6 +273,9 @@ namespace Server
                 NetworkStream stream = sender.GetStream();
 
                 stream.Write(data, 0, data.Length);
+
+                stream.Close();
+                sender.Close();
             }
             catch (Exception ex) {
                 Console.WriteLine("Send Exception : " + ex.Message);
