@@ -145,8 +145,6 @@ namespace Server
         #endregion
 
         void PingUsers() {
-            Ping ping = new Ping();
-
             while (true) {
 
                 if (onlineUsers != null) {
