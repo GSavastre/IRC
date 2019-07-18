@@ -44,16 +44,16 @@ namespace Server
             try
             {
                 server.Start();
-                Console.WriteLine("Server started...");
-                
                 do {
-                    Console.Write("Inserisci un nome per il tuo server");
-                    Console.ReadLine();
+                    Console.Write("Inserisci un nome per il tuo server: ");
+                    serverName = Console.ReadLine();
 
                     if (string.IsNullOrWhiteSpace(serverName)) {
                         Console.WriteLine("Nome server non valido");
                     }
                 } while (string.IsNullOrWhiteSpace(serverName));
+                Console.WriteLine("Server started...");
+                
             }
             catch (SocketException e)
             {

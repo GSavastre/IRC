@@ -29,8 +29,17 @@ namespace Client {
                 AddToListCallback d = new AddToListCallback(AddToList);
                 this.Invoke(d, new object[] { text });
             } else {
-                if (!lbServer.Items.Contains(text)) {
-                    this.lbServer.Items.Add(text);
+                string[] serverInfo = text.Split(':').ToArray();
+
+                if (serverInfo.Count().Equals(2)) {
+                    //Text > serverName:serverAddress
+                    string serverName = serverInfo[0];
+                    string serverAddress = serverInfo[1];
+                    serversList.Add(serverName, serverAddress);
+
+                    if (!lbServer.Items.Contains(serverName)) {
+                        lbServer.Items.Add(serverName);
+                    }
                 }
             }
         }
@@ -48,7 +57,8 @@ namespace Client {
             string hostname = Dns.GetHostName();
             #pragma warning disable CS0618 // Type or member is obsolete
             IPHostEntry allLocalNetworkAddresses = Dns.Resolve(hostname);
-            #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
+            serversList = new Dictionary<string, string>();
 
             while (true) {
                 //Attraverso tutte le interfacce
@@ -117,7 +127,8 @@ namespace Client {
 
         private void BtnSubmit_Click(object sender, EventArgs e) {
 
-            string selectedServerIp = lbServer.GetItemText(lbServer.SelectedItem);
+            string selectedServerName = lbServer.GetItemText(lbServer.SelectedItem);
+            string selectedServerAddress;
 
             if (string.IsNullOrEmpty(selectedServerIp)) {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
