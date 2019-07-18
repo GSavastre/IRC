@@ -118,8 +118,9 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            Form chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr);
+            ChatBox chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr);
             chat.Text = ((ircUser)partner_button.Tag).username;
+            chatList.Add(chat);
             chat.Show();
         }
 

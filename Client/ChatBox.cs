@@ -28,7 +28,7 @@ namespace Client
         }
 
         public void AddMessage(String message) {
-            lb_chat.Items.Add(message);
+            lb_chat.Items.Add("You : " + message);
         }
 
         private void btn_send_Click(object sender, EventArgs e)
