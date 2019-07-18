@@ -83,8 +83,16 @@ namespace Server
                     switch (msg.action) {
                         case 0: //Registrazione nuovo utente
                             Console.WriteLine("REGISTER_USER_REQUEST Received");
-                            Register(msg.message.Split(':')[0], msg.message.Split(':')[1]);     //msg.message contiene username+password; vado a dividere la stringa in 2
-                            Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
+                            //msg.message contiene username+password; vado a dividere la stringa in 2
+                            if (Register(msg.message.Split(':')[0], msg.message.Split(':')[1]) != 0)
+                            {
+                                Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
+                            }
+                            else
+                            {
+                                Console.WriteLine("Registrazione fallita");
+                                Send(senderAddress, onlineUsers);
+                            }
                             UpdateOnlineUsers();
                             break;
                         case 1: //Login
@@ -217,11 +225,11 @@ namespace Server
             return new List<ircUser>();
         }
 
-        private void Register(string username, string password) {
+        private int Register(string username, string password) {
             Console.WriteLine($"Inizio processo di registrazione per {username}");
             DBManager dbManager = new DBManager();
 
-            dbManager.Insert(TableNames.usersTable, new Dictionary<string, string> {
+            return dbManager.Insert(TableNames.usersTable, new Dictionary<string, string> {
                 {"username", username},
                 {"password", Crypto.HashPassword(password)}
             });

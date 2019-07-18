@@ -165,7 +165,7 @@ namespace Server {
         ///     </code>
         /// </para>
         /// </param>
-        public void Insert(string table, Dictionary<string, string> parameters) {
+        public int Insert(string table, Dictionary<string, string> parameters) {
 
             List<string> parameterNames = new List<string>();
             List<string> parameterValues = new List<string>();
@@ -174,15 +174,15 @@ namespace Server {
                 parameterNames.Add(parameter.Key);
                 parameterValues.Add("'"+parameter.Value+"'");
             }
-
+            int result = 0;
             if (this.OpenConnection() && this.ColumnsExists(table, parameterNames)) {
                 //MySQL does the casting from string to int when necessary
                 string query = $"INSERT INTO {table} ({string.Join(", ", parameterNames)}) VALUES({string.Join(", ", parameterValues)});";
                 MySqlTransaction transaction = connection.BeginTransaction();
                 MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
-
+                
                 try {
-                    cmd.ExecuteNonQuery();
+                    result = cmd.ExecuteNonQuery();
                     transaction.Commit();
                 } catch (Exception) {
 
@@ -197,6 +197,7 @@ namespace Server {
             }
 
             this.CloseConnection();
+            return result;
         }
         
         /// <summary>
