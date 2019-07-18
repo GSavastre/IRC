@@ -25,7 +25,7 @@ namespace Client
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
-        
+        List<ChatBox> chatList = new List<ChatBox>();
 
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
@@ -109,6 +109,8 @@ namespace Client
         }
 
         delegate void LoadContactsCallback();
+        delegate void CreateChatCallback(ircMessage msg, string server_addr);
+        delegate void UpdateChatCallback(ChatBox chatBox, ircMessage msg);
 
         /// <summary>
         ///  Handler dinamico per instanziare nuove chat.
@@ -116,8 +118,9 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            ircUser partner = new ircUser(((ircUser)partner_button.Tag).username, ((ircUser)partner_button.Tag).address);
-            Form chat = new Chat(partner, server_addr);
+            ChatBox chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr);
+            chat.Text = ((ircUser)partner_button.Tag).username;
+            chatList.Add(chat);
             chat.Show();
         }
 
@@ -127,6 +130,8 @@ namespace Client
             TcpClient client;
             listener.Start();
             LoadContactsCallback contactsCallback = new LoadContactsCallback(LoadContacts);
+            CreateChatCallback createChatCallback = new CreateChatCallback(CreateChatBox);
+            UpdateChatCallback updateChatCallBack = new UpdateChatCallback(UpdateChat);
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -141,7 +146,27 @@ namespace Client
                         try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
-                            MessageBox.Show($"Arrivato un messaggio da {newMessage.sender_username} : {newMessage.message}");
+                            if (chatList.Count != 0)
+                            {
+                                foreach (ChatBox cb in chatList)
+                                {
+                                    if (cb.Text == newMessage.sender_username)
+                                    {
+                                        Invoke(updateChatCallBack, cb, newMessage);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Invoke(createChatCallback, newMessage, server_addr);
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Invoke(createChatCallback,  newMessage, server_addr);
+                            }
+                            
                         }
                         catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
                         {   
@@ -199,6 +224,37 @@ namespace Client
         {
             MessageBox.Show("Chiusura Form Home");
         }
-        
+
+        private void CreateChatBox(ircMessage msg, string server_addr)
+        {
+            ChatBox chatBox = new ChatBox(msg.sender_username, server_addr);
+            chatBox.AddMessage(msg.message);
+            chatList.Add(chatBox);
+            chatBox.Show();
+        }
+
+        private void UpdateChat(ChatBox chatBox, ircMessage msg)
+        {
+            chatBox.AddMessage(msg.sender_username + " : " + msg.message);
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+
+            // Confirm user wants to close
+            switch (MessageBox.Show(this, "Are you sure you want to close?", "Closing", MessageBoxButtons.YesNo))
+            {
+                case DialogResult.No:
+                    e.Cancel = true;
+                    break;
+                default:
+                    listener.Stop();
+                    tcpListenerThread.Abort();
+                    break;
+            }
+        }
     }
 }
