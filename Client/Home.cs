@@ -41,7 +41,7 @@ namespace Client
         }
 
         /// <summary>
-        ///  Genere la GUI per la lista di utenti online
+        ///  Genera la GUI per la lista di utenti online
         /// </summary>
         /// <param users="Lista di Utenti online">
         ///     List<ircUser> contenente gli utenti online
