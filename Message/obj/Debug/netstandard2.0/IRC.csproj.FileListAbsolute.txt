@@ -7,3 +7,12 @@ C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.Assembl
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.csprojAssemblyReference.cache
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.deps.json
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.dll
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.pdb
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.csprojAssemblyReference.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.csproj.CoreCompileInputs.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfoInputs.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
