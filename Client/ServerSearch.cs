@@ -73,7 +73,7 @@ namespace Client {
 
                         try
                         {
-                            tcpClient.Connect(server.Value, serverPort);
+                            tcpClient.Connect(server.Value, serverPingPort);
                             tcpClient.Close();
                         }
                         catch (Exception)
@@ -89,7 +89,7 @@ namespace Client {
                         {
                             Console.WriteLine(ex.Message);
                         }
-                        //Thread.Sleep(1000);
+                        Thread.Sleep(1000);
                     }
                 }
             }
