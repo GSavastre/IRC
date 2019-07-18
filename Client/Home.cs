@@ -119,7 +119,6 @@ namespace Client
         {
             Button partner_button = sender as Button;
             ChatBox chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr, this);
-            chat.Text = ((ircUser)partner_button.Tag).username;
             chatList.Add(chat);
             chat.Show();
         }
@@ -148,25 +147,25 @@ namespace Client
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
                             if (chatList.Count != 0)
                             {
+                                bool found = false;
                                 foreach (ChatBox cb in chatList)
                                 {
                                     if (cb.Text == newMessage.sender_username)
                                     {
                                         Invoke(updateChatCallBack, cb, newMessage);
+                                        found = true;
                                         break;
                                     }
-                                    else
-                                    {
-                                        Invoke(createChatCallback, newMessage, server_addr);
-                                        break;
-                                    }
+                                }
+                                if (!found)
+                                {
+                                    Invoke(createChatCallback, newMessage, server_addr);
                                 }
                             }
                             else
                             {
                                 Invoke(createChatCallback,  newMessage, server_addr);
                             }
-                            
                         }
                         catch       //prova a convertire cio che riceve in List<ircUser> , se funziona mostra quanti utenti online ci sono
                         {   
