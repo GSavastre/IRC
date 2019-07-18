@@ -22,6 +22,8 @@ namespace Server
 
         private const int port = 7777;
 
+        private const int pingPort = 7779;
+
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
         Thread tcpListnerThread = null;
@@ -30,13 +32,12 @@ namespace Server
         public Server()
         {
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
-            
 
             Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
-            
 
             IPAddress ip = IPAddress.Any;
             TcpListener server = new TcpListener(ip, port);
+            TcpListener pingListener = new TcpListener(ip, pingPort);
 
             onlineUsers = new List<ircUser>();
             serverName = string.Empty;
@@ -44,6 +45,7 @@ namespace Server
             try
             {
                 server.Start();
+                pingListener.Start();
                 do {
                     Console.Write("Inserisci un nome per il tuo server: ");
                     serverName = Console.ReadLine();
