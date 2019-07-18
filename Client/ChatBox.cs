@@ -37,18 +37,20 @@ namespace Client
         {
             try
             {
-                client = new TcpClient(server_addr, port);
+                if (tb_msg.Text != "")
+                {
+                    client = new TcpClient(server_addr, port);
 
-                ircMessage msg = new ircMessage(Home.current_user.username, partner_username, tb_msg.Text, 2);
+                    ircMessage msg = new ircMessage(Home.current_user.username, partner_username, tb_msg.Text, 2);
 
-                NetworkStream stream = client.GetStream();
-                stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(ircMessage.ObjToBytes(msg), 0, ircMessage.ObjToBytes(msg).Length);
+                    lb_chat.Items.Add("You : " + msg.message);
 
-                lb_chat.Items.Add("You : " + msg.message);
-
-                tb_msg.Text = ""; //Ripulisce casella di scrittura del form
-                stream.Close();
-                client.Close();
+                    tb_msg.Text = ""; //Ripulisce casella di scrittura del form
+                    stream.Close();
+                    client.Close();
+                }
             }
             catch (Exception ex)
             {
