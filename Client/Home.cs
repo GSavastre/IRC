@@ -230,7 +230,7 @@ namespace Client
                     chat.AddMessage(message.message);
                 }
 
-                chat.ShowDialog();
+                chat.Show();
             }
         }
 
