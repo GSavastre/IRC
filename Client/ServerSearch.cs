@@ -94,20 +94,31 @@ namespace Client {
                         //Creo oggetto per il server
                         IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                         EndPoint tempRemoteEP = (EndPoint)sender;
-                        byte[] buffer = new byte[replyDataConf.Length];
-
+                        byte[] raw = new byte[1024];
+                        
                         //Ricevo dal server, non aspetto più di 3 secondi
                         client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 3000);
+                        int length = client.ReceiveFrom(raw, ref tempRemoteEP);
+
+                        byte[] buffer = new byte[length];
+
+                        for (int i = 0; i < length; i++) {
+                            buffer[i] = raw[i];
+                        }
 
                         //Ricevo il messaggio, l'interfaccia remota provverà le informazioni necessarie come indirizzo IP e porta
-                        client.ReceiveFrom(buffer, ref tempRemoteEP);
-                        string[] response = Encoding.ASCII.GetString(buffer).Split(':').ToArray();
-                        //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
+                        try {
 
-                        if (response[0].Equals(Encoding.ASCII.GetString(replyDataConf).Split(':'))) {
-                            //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
-                            string serverInfo = response[0]+":"+tempRemoteEP.ToString().Split(':').ToArray()[0];
-                            AddToList(serverInfo);
+                            string[] response = Encoding.ASCII.GetString(buffer).Split(':').ToArray();
+                            //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
+
+                            if (response[0].Equals(Encoding.ASCII.GetString(replyDataConf))) {
+                                //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
+                                string serverInfo = response[1] + ":" + tempRemoteEP.ToString().Split(':').ToArray()[0];
+                                AddToList(serverInfo);
+                            }
+                        } catch (Exception e) {
+                            MessageBox.Show(e.Message);
                         }
 
                     } catch {
