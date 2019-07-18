@@ -35,10 +35,14 @@ namespace Client {
                     //Text > serverName:serverAddress
                     string serverName = serverInfo[0];
                     string serverAddress = serverInfo[1];
-                    serversList.Add(serverName, serverAddress);
 
-                    if (!lbServer.Items.Contains(serverName)) {
-                        lbServer.Items.Add(serverName);
+
+                    if (!serversList.ContainsKey(serverName)) {
+                        serversList.Add(serverName, serverAddress);
+
+                        if (!lbServer.Items.Contains(serverName)) {
+                            lbServer.Items.Add(serverName);
+                        }
                     }
                 }
             }
@@ -128,21 +132,25 @@ namespace Client {
         private void BtnSubmit_Click(object sender, EventArgs e) {
 
             string selectedServerName = lbServer.GetItemText(lbServer.SelectedItem);
-            string selectedServerAddress;
+            string selectedServerAddress = string.Empty;
 
-            if (string.IsNullOrEmpty(selectedServerIp)) {
+            if (!serversList.TryGetValue(selectedServerName, out selectedServerAddress)) {
+                selectedServerAddress = string.Empty;
+            }
+            
+            if (string.IsNullOrEmpty(selectedServerAddress)) {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
 
                 discoveryThread.Suspend(); //sospendiamo il thread
 
                 this.Hide();
-                loginForm = new Login(selectedServerIp);
+                loginForm = new Login(selectedServerAddress);
                 Form regForm;
                 bool loop = true;
                 while (loop) {
                     if (loginForm.ShowDialog() == DialogResult.Yes) {
-                        regForm = new Register(selectedServerIp);
+                        regForm = new Register(selectedServerAddress);
                         if (regForm.ShowDialog() != DialogResult.Yes) {
                             loop = false;
                         }
