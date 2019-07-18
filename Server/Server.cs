@@ -83,6 +83,7 @@ namespace Server
                             Console.WriteLine("REGISTER_USER_REQUEST Received");
                             Register(msg.message.Split(':')[0], msg.message.Split(':')[1]);     //msg.message contiene username+password; vado a dividere la stringa in 2
                             Send(senderAddress, Login(msg.message.Split(':')[0], msg.message.Split(':')[1], senderAddress));
+                            UpdateOnlineUsers();
                             break;
                         case 1: //Login
                             Console.WriteLine("LOGIN_USER_REQUEST Received");
