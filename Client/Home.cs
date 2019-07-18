@@ -118,7 +118,7 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            ChatBox chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr);
+            ChatBox chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr, this);
             chat.Text = ((ircUser)partner_button.Tag).username;
             chatList.Add(chat);
             chat.Show();
@@ -209,8 +209,6 @@ namespace Client
                 stream.Close();
                 client.Close();
             }
-
-            
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -220,15 +218,10 @@ namespace Client
             Application.Exit();
         }
 
-        private void Home_Closing(object sender, CancelEventArgs e)
-        {
-            MessageBox.Show("Chiusura Form Home");
-        }
-
         private void CreateChatBox(ircMessage msg, string server_addr)
         {
-            ChatBox chatBox = new ChatBox(msg.sender_username, server_addr);
-            chatBox.AddMessage(msg.message);
+            ChatBox chatBox = new ChatBox(msg.sender_username, server_addr, this);
+            chatBox.AddMessage(msg.sender_username + " : " + msg.message);
             chatList.Add(chatBox);
             chatBox.Show();
         }
@@ -256,5 +249,11 @@ namespace Client
                     break;
             }
         }
+
+        public void EndChat(ChatBox chatBox)
+        {
+            chatList.Remove(chatBox);
+        }
+
     }
 }
