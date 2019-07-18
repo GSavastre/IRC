@@ -1,35 +1,37 @@
 ﻿using System;
-using System.Text;
-using System.Windows.Forms;
-using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using System.Net;
-using irc;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using irc;
 
 namespace Client
 {
-    public partial class Chat : Form
+    public partial class ChatBox : Form
     {
         string server_addr;
         const int port = 7777;
         TcpClient client = null;
-        string partner_username ;
+        string partner_username;
 
-        public Chat(string myPartner, string myServer_addr)
+        public ChatBox(string partner_username, string server_addr)
         {
             InitializeComponent();
-            server_addr = myServer_addr;
-            partner_username = myPartner;
-            this.Text = partner_username;
+            this.partner_username = partner_username;
+            this.server_addr = server_addr;
+            Text = partner_username;
         }
 
-        public Chat() {
-            InitializeComponent();
+        public void AddMessage(String message) {
+            lb_chat.Items.Add(message);
         }
 
-        private void btn_test_Click(object sender, EventArgs e)
+        private void btn_send_Click(object sender, EventArgs e)
         {
             try
             {
@@ -46,15 +48,10 @@ namespace Client
                 stream.Close();
                 client.Close();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 MessageBox.Show("Chat send exception : " + ex.Message);
             }
-            
-        }
-
-        public void AddMessage(string message) {
-            lb_chat.Items.Add(partner_username + " : " + message);
-            MessageBox.Show("added " + message);
         }
     }
 }

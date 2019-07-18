@@ -25,7 +25,7 @@ namespace Client
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
-        List<Chat> chatList = new List<Chat>();
+        List<ChatBox> chatList = new List<ChatBox>();
 
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
@@ -109,6 +109,8 @@ namespace Client
         }
 
         delegate void LoadContactsCallback();
+        delegate void CreateChatCallback(ircMessage msg, string server_addr);
+        delegate void UpdateChatCallback(ChatBox chatBox, ircMessage msg);
 
         /// <summary>
         ///  Handler dinamico per instanziare nuove chat.
@@ -116,7 +118,8 @@ namespace Client
         private void startChat_Button_Click(object sender, EventArgs e)
         {
             Button partner_button = sender as Button;
-            Form chat = new Chat(((ircUser)partner_button.Tag).username, server_addr);
+            Form chat = new ChatBox(((ircUser)partner_button.Tag).username, server_addr);
+            chat.Text = ((ircUser)partner_button.Tag).username;
             chat.Show();
         }
 
@@ -126,6 +129,8 @@ namespace Client
             TcpClient client;
             listener.Start();
             LoadContactsCallback contactsCallback = new LoadContactsCallback(LoadContacts);
+            CreateChatCallback createChatCallback = new CreateChatCallback(CreateChatBox);
+            UpdateChatCallback updateChatCallBack = new UpdateChatCallback(UpdateChat);
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -142,26 +147,23 @@ namespace Client
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
                             if (chatList.Count != 0)
                             {
-                                foreach (Chat chat in chatList)
+                                foreach (ChatBox cb in chatList)
                                 {
-                                    if (chat.Text == newMessage.sender_username)
+                                    if (cb.Text == newMessage.sender_username)
                                     {
-                                        chat.AddMessage(newMessage.message);
+                                        Invoke(updateChatCallBack, cb, newMessage);
+                                        break;
                                     }
                                     else
                                     {
-                                        Chat newChat = new Chat(newMessage.sender_username, server_addr);
-                                        newChat.Show();
-                                        newChat.AddMessage(newMessage.message);
-                                        chatList.Add(newChat);
+                                        Invoke(createChatCallback, newMessage.sender_username, server_addr);
+                                        break;
                                     }
                                 }
                             }
-                            else {
-                                Chat newChat = new Chat(newMessage.sender_username, server_addr);
-                                newChat.AddMessage(newMessage.message);
-                                newChat.ShowDialog();
-                                chatList.Add(newChat);
+                            else
+                            {
+                                Invoke(createChatCallback, newMessage.sender_username, server_addr);
                             }
                             
                         }
@@ -220,6 +222,19 @@ namespace Client
         private void Home_Closing(object sender, CancelEventArgs e)
         {
             MessageBox.Show("Chiusura Form Home");
+        }
+
+        private void CreateChatBox(ircMessage msg, string server_addr)
+        {
+            ChatBox chatBox = new ChatBox(msg.sender_username, server_addr);
+            chatBox.AddMessage(msg.message);
+            chatList.Add(chatBox);
+            chatBox.Show();
+        }
+
+        private void UpdateChat(ChatBox chatBox, ircMessage msg)
+        {
+            chatBox.AddMessage(msg.sender_username + " : " + msg.message);
         }
         
     }
