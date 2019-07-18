@@ -16,6 +16,7 @@ C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.Assem
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
 C:\Users\cosmi\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
+<<<<<<< HEAD
 C:\Users\Locas\Desktop\IRC\Message\bin\Debug\netstandard2.0\IRC.deps.json
 C:\Users\Locas\Desktop\IRC\Message\bin\Debug\netstandard2.0\IRC.dll
 C:\Users\Locas\Desktop\IRC\Message\bin\Debug\netstandard2.0\IRC.pdb
@@ -25,3 +26,14 @@ C:\Users\Locas\Desktop\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfoInpu
 C:\Users\Locas\Desktop\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
 C:\Users\Locas\Desktop\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
 C:\Users\Locas\Desktop\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
+=======
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.deps.json
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.dll
+C:\Users\Gabriele\source\repos\IRC\Message\bin\Debug\netstandard2.0\IRC.pdb
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.csprojAssemblyReference.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.csproj.CoreCompileInputs.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfoInputs.cache
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
+C:\Users\Gabriele\source\repos\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
+>>>>>>> develop

@@ -17,6 +17,7 @@ namespace Client {
 
         Thread discoveryThread;
         Login loginForm;
+        Dictionary<string, string> serversList;
 
         delegate void AddToListCallback(string text);
 
@@ -28,8 +29,21 @@ namespace Client {
                 AddToListCallback d = new AddToListCallback(AddToList);
                 this.Invoke(d, new object[] { text });
             } else {
-                if (!lbServer.Items.Contains(text)) {
-                    this.lbServer.Items.Add(text);
+                string[] serverInfo = text.Split(':').ToArray();
+
+                if (serverInfo.Count().Equals(2)) {
+                    //Text > serverName:serverAddress
+                    string serverName = serverInfo[0];
+                    string serverAddress = serverInfo[1];
+
+
+                    if (!serversList.ContainsKey(serverName)) {
+                        serversList.Add(serverName, serverAddress);
+
+                        if (!lbServer.Items.Contains(serverName)) {
+                            lbServer.Items.Add(serverName);
+                        }
+                    }
                 }
             }
         }
@@ -47,7 +61,8 @@ namespace Client {
             string hostname = Dns.GetHostName();
             #pragma warning disable CS0618 // Type or member is obsolete
             IPHostEntry allLocalNetworkAddresses = Dns.Resolve(hostname);
-            #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
+            serversList = new Dictionary<string, string>();
 
             while (true) {
                 //Attraverso tutte le interfacce
@@ -79,20 +94,31 @@ namespace Client {
                         //Creo oggetto per il server
                         IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                         EndPoint tempRemoteEP = (EndPoint)sender;
-                        byte[] buffer = new byte[replyDataConf.Length];
-
+                        byte[] raw = new byte[1024];
+                        
                         //Ricevo dal server, non aspetto più di 3 secondi
                         client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 3000);
+                        int length = client.ReceiveFrom(raw, ref tempRemoteEP);
+
+                        byte[] buffer = new byte[length];
+
+                        for (int i = 0; i < length; i++) {
+                            buffer[i] = raw[i];
+                        }
 
                         //Ricevo il messaggio, l'interfaccia remota provverà le informazioni necessarie come indirizzo IP e porta
-                        client.ReceiveFrom(buffer, ref tempRemoteEP);
-                        string response = Encoding.ASCII.GetString(buffer);
-                        //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
+                        try {
 
-                        if (response.Equals(Encoding.ASCII.GetString(replyDataConf))) {
-                            //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
-                            string serverIP = tempRemoteEP.ToString().Split(':').ToArray()[0];
-                            AddToList(serverIP);
+                            string[] response = Encoding.ASCII.GetString(buffer).Split(':').ToArray();
+                            //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
+
+                            if (response[0].Equals(Encoding.ASCII.GetString(replyDataConf))) {
+                                //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
+                                string serverInfo = response[1] + ":" + tempRemoteEP.ToString().Split(':').ToArray()[0];
+                                AddToList(serverInfo);
+                            }
+                        } catch (Exception e) {
+                            MessageBox.Show(e.Message);
                         }
 
                     } catch {
@@ -110,27 +136,32 @@ namespace Client {
             {
                 IsBackground = true //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
             };
-
+            serversList = new Dictionary<string, string>();
             discoveryThread.Start();
         }
 
         private void BtnSubmit_Click(object sender, EventArgs e) {
 
-            string selectedServerIp = lbServer.GetItemText(lbServer.SelectedItem);
+            string selectedServerName = lbServer.GetItemText(lbServer.SelectedItem);
+            string selectedServerAddress = string.Empty;
 
-            if (string.IsNullOrEmpty(selectedServerIp)) {
+            if (!serversList.TryGetValue(selectedServerName, out selectedServerAddress)) {
+                selectedServerAddress = string.Empty;
+            }
+            
+            if (string.IsNullOrEmpty(selectedServerAddress)) {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
 
                 discoveryThread.Suspend(); //sospendiamo il thread
 
                 this.Hide();
-                loginForm = new Login(selectedServerIp);
+                loginForm = new Login(selectedServerAddress);
                 Form regForm;
                 bool loop = true;
                 while (loop) {
                     if (loginForm.ShowDialog() == DialogResult.Yes) {
-                        regForm = new Register(selectedServerIp);
+                        regForm = new Register(selectedServerAddress);
                         if (regForm.ShowDialog() != DialogResult.Yes) {
                             loop = false;
                         }

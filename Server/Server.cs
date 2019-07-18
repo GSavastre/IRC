@@ -25,30 +25,43 @@ namespace Server
         //Lista di utenti online sul server
         List<ircUser> onlineUsers;
         Thread tcpListnerThread = null;
+        string serverName;
 
         public Server()
         {
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
-            discoveryListener.Start();
+            
 
             Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
-            pingOnlineUsers.Start();
+            
 
             IPAddress ip = IPAddress.Any;
             TcpListener server = new TcpListener(ip, port);
 
             onlineUsers = new List<ircUser>();
+            serverName = string.Empty;
 
             try
             {
                 server.Start();
+                do {
+                    Console.Write("Inserisci un nome per il tuo server: ");
+                    serverName = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(serverName)) {
+                        Console.WriteLine("Nome server non valido");
+                    }
+                } while (string.IsNullOrWhiteSpace(serverName));
                 Console.WriteLine("Server started...");
+                
             }
             catch (SocketException e)
             {
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
             }
+            discoveryListener.Start();
+            pingOnlineUsers.Start();
 
             tcpListnerThread = new Thread(() => {
 
@@ -100,7 +113,7 @@ namespace Server
         private void DiscoveryListener() {
 
             //Messaggio di risposta alla server discovery request
-            byte[] listenerResponseData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_ACK");
+            byte[] listenerResponseData = Encoding.ASCII.GetBytes($"DISCOVER_IRCSERVER_ACK:{serverName}");
 
             //Il messaggio di richiesta dovrà corrispondere a questa stringa
             byte[] listenerRequestCheck = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
@@ -163,7 +176,7 @@ namespace Server
                         } catch (Exception ex) {
                             Console.WriteLine(ex.Message);
                         }
-                        Thread.Sleep(500);
+                        Thread.Sleep(1000);
                     }
                 }
             }

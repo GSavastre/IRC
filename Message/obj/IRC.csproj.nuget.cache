@@ -1,5 +1,9 @@
 {
   "version": 1,
+<<<<<<< HEAD
   "dgSpecHash": "pAhoaE08TPnL6ZKDgG0GppTXzM49aSz1GbjPlxNEb/Gt2tdxI8lKWa9xRXgzwI1MXSa3D6aL+yvR756aF28Ayw==",
+=======
+  "dgSpecHash": "Z4RPg/+zuf2rQ99RttYSFUsd504vKDZoDxJ7imwNJjMgD8vFbsGpgq/W9k75iy/dNoQ4jsYbgRyflWVKZni2yg==",
+>>>>>>> develop
   "success": true
 }
