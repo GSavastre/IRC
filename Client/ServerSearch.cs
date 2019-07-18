@@ -17,6 +17,7 @@ namespace Client {
 
         Thread discoveryThread;
         Login loginForm;
+        Dictionary<string, string> serversList;
 
         delegate void AddToListCallback(string text);
 
@@ -86,13 +87,13 @@ namespace Client {
 
                         //Ricevo il messaggio, l'interfaccia remota provverà le informazioni necessarie come indirizzo IP e porta
                         client.ReceiveFrom(buffer, ref tempRemoteEP);
-                        string response = Encoding.ASCII.GetString(buffer);
+                        string[] response = Encoding.ASCII.GetString(buffer).Split(':').ToArray();
                         //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
 
-                        if (response.Equals(Encoding.ASCII.GetString(replyDataConf))) {
+                        if (response[0].Equals(Encoding.ASCII.GetString(replyDataConf).Split(':'))) {
                             //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
-                            string serverIP = tempRemoteEP.ToString().Split(':').ToArray()[0];
-                            AddToList(serverIP);
+                            string serverInfo = response[0]+":"+tempRemoteEP.ToString().Split(':').ToArray()[0];
+                            AddToList(serverInfo);
                         }
 
                     } catch {
