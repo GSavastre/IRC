@@ -156,14 +156,14 @@ namespace Client
                                     }
                                     else
                                     {
-                                        Invoke(createChatCallback, newMessage.sender_username, server_addr);
+                                        Invoke(createChatCallback, newMessage, server_addr);
                                         break;
                                     }
                                 }
                             }
                             else
                             {
-                                Invoke(createChatCallback, newMessage.sender_username, server_addr);
+                                Invoke(createChatCallback,  newMessage, server_addr);
                             }
                             
                         }
