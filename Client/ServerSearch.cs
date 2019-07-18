@@ -16,10 +16,19 @@ namespace Client {
     public partial class ServerSearch : Form {
 
         Thread discoveryThread;
+        Thread pingServersThread;
         Login loginForm;
         Dictionary<string, string> serversList;
+        int serverPingPort = 7779;
 
         delegate void AddToListCallback(string text);
+        delegate void RemoveFromListCallback(KeyValuePair<string, string> server);
+
+        private void RemoveFromList(KeyValuePair<string, string> server) { 
+
+            serversList.Remove(server.Key);
+            lbServer.Items.Remove(server.Key);
+        }
 
         private void AddToList(string text) {
             // InvokeRequired required compares the thread ID of the
@@ -41,12 +50,51 @@ namespace Client {
                         serversList.Add(serverName, serverAddress);
 
                         if (!lbServer.Items.Contains(serverName)) {
+
                             lbServer.Items.Add(serverName);
                         }
                     }
                 }
             }
         }
+
+        void PingServer()
+        {
+            RemoveFromListCallback remove = new RemoveFromListCallback(RemoveFromList);
+            while (true)
+            {
+
+                if (serversList != null)
+                {
+                    foreach (KeyValuePair<string,string> server in serversList.ToList())
+                    {
+                        
+                        TcpClient tcpClient = new TcpClient();
+
+                        try
+                        {
+                            tcpClient.Connect(server.Value, serverPort);
+                            tcpClient.Close();
+                        }
+                        catch (Exception)
+                        {
+                            Invoke(remove,server);
+                        }
+
+                        try
+                        {
+                            tcpClient.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        //Thread.Sleep(1000);
+                    }
+                }
+            }
+        }
+
 
         #region ServerDiscovery
         void DiscoverServers() {
@@ -137,7 +185,14 @@ namespace Client {
                 IsBackground = true //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
             };
             serversList = new Dictionary<string, string>();
+
+            pingServersThread = new Thread(new ThreadStart(PingServer))
+            {
+                IsBackground = true //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
+            };
+
             discoveryThread.Start();
+            pingServersThread.Start();
         }
 
         private void BtnSubmit_Click(object sender, EventArgs e) {
@@ -154,6 +209,7 @@ namespace Client {
             } else {
 
                 discoveryThread.Suspend(); //sospendiamo il thread
+                pingServersThread.Suspend();
 
                 this.Hide();
                 loginForm = new Login(selectedServerAddress);
@@ -170,6 +226,7 @@ namespace Client {
                     }
                 }
                 discoveryThread.Resume();   //riattiviamo il thread se torniamo qui
+                pingServersThread.Resume();
                 try
                 {
                     this.Show();
