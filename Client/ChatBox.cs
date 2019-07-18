@@ -57,7 +57,7 @@ namespace Client
                 MessageBox.Show("Chat send exception : " + ex.Message);
             }
         }
-
+    
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
@@ -70,11 +70,11 @@ namespace Client
                 case DialogResult.No:
                     e.Cancel = true;
                     break;
-                default:
+                case DialogResult.Yes:
                     home_reference.EndChat(this);
                     break;
             }
         }
-
+        
     }
 }
