@@ -30,10 +30,10 @@ namespace Server
         public Server()
         {
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
-            discoveryListener.Start();
+            
 
             Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
-            pingOnlineUsers.Start();
+            
 
             IPAddress ip = IPAddress.Any;
             TcpListener server = new TcpListener(ip, port);
@@ -60,6 +60,8 @@ namespace Server
                 Console.WriteLine("SocketException: {0}", e);
                 Console.Read();
             }
+            discoveryListener.Start();
+            pingOnlineUsers.Start();
 
             tcpListnerThread = new Thread(() => {
 

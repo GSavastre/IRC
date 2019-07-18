@@ -125,7 +125,7 @@ namespace Client {
             {
                 IsBackground = true //Settiamo thread come background così quando si chiude il main thread si chiudono anche quelli in background
             };
-
+            serversList = new Dictionary<string, string>();
             discoveryThread.Start();
         }
 
