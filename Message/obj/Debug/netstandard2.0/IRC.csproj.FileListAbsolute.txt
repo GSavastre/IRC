@@ -6,3 +6,4 @@ C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.Assembl
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.AssemblyInfo.cs
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.dll
 C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.pdb
+C:\Users\Dax\Documents\Uni\Reti\IRC\Message\obj\Debug\netstandard2.0\IRC.csprojAssemblyReference.cache

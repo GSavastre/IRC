@@ -68,6 +68,5 @@ namespace irc
                 return m;
             }
         }
-
     }
 }
