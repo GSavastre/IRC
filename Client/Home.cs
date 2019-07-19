@@ -17,16 +17,20 @@ namespace Client
 {
     public partial class Home : Form
     {
-        const int port = 7777;
+        //porta predefinita del server
+        const int port = 7777;                      
         string server_addr = "";
+        //utente attuale (che ha fatto login)
         public static ircUser current_user;
+        //lista utenti online
         List<ircUser> online_users = null;
-
+        
         TcpListener listener = null;
         Thread tcpListenerThread = null;
 
+        //lista di chat attive
         List<ChatBox> chatList = new List<ChatBox>();
-
+    
         public Home(string myServer_addr, ircUser myCurrent_user, List<ircUser> myOnline_users)
         {
             InitializeComponent();
@@ -49,6 +53,8 @@ namespace Client
         private void LoadContacts() {
             flp_contacts.Controls.Clear();
             foreach (ircUser user in online_users) {
+                //aggiungo nuovo utente alla lista(tranne me stesso)
+                //creazione dinamica dei bottoni nella lista degli utenti attivi
                 if (user.username != current_user.username)
                 {
                     Panel panel = new Panel
@@ -108,6 +114,7 @@ namespace Client
             }
         }
 
+        //Funzioni delegate da richiamare con la funzione Invoke da un altro Thread
         delegate void LoadContactsCallback();
         delegate void CreateChatCallback(ircMessage msg, string server_addr);
         delegate void UpdateChatCallback(ChatBox chatBox, ircMessage msg);
@@ -123,14 +130,20 @@ namespace Client
             chat.Show();
         }
 
+        /// <summary>
+        ///  Avvia un thread per l'ascolto di messaggi dal Server
+        /// </summary>
         private void StartTcpListenerThread()
         {
+            //istanzio il listner
             listener = new TcpListener(IPAddress.Any, port);
             TcpClient client;
             listener.Start();
+            //creo collegamento tra le funzioni di callback e le funzioni del thread main da richiamare
             LoadContactsCallback contactsCallback = new LoadContactsCallback(LoadContacts);
             CreateChatCallback createChatCallback = new CreateChatCallback(CreateChatBox);
             UpdateChatCallback updateChatCallBack = new UpdateChatCallback(UpdateChat);
+            //creo nuovo thread
             tcpListenerThread = new Thread(() =>
             {
                 while (true)
@@ -142,9 +155,13 @@ namespace Client
                         NetworkStream stream = client.GetStream();
                         int len = stream.Read(buffer, 0, buffer.Length);
                         
-                        try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box
+                        try         //prova a convertire cio che riceve in ircMessage, se funziona -> message box, altrimenti va in catch
                         {
                             ircMessage newMessage = (ircMessage)ircMessage.BytesToObj(buffer, len);
+                            /*Controllo se la lista di chat e' vuota , vado direttamente nell else e creo la chat
+                             *Se esistono gia' chat, ciclo la lista di chat finche' non trovo quella con l utente da cui mi arriva il messaggio 
+                             *Aggiorno visualmente la chat
+                             */
                             if (chatList.Count != 0)
                             {
                                 bool found = false;
@@ -179,11 +196,13 @@ namespace Client
                     }
                 }
             });
+            //avvio il thread di ascolto
             tcpListenerThread.Start();
         }
 
         private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //Invio ircMessage con l'istruzione di logout e chiudo il form
             TcpClient client = null;
             NetworkStream stream = null;
             try
@@ -212,11 +231,14 @@ namespace Client
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            //chiudo thread ed esco dall'applicativo
             tcpListenerThread.Abort();
             Application.Exit();
         }
 
+        /// <summary>
+        ///  Crea nuova chat in base al messaggio che mi arriva
+        /// </summary>
         private void CreateChatBox(ircMessage msg, string server_addr)
         {
             ChatBox chatBox = new ChatBox(msg.sender_username, server_addr, this);
@@ -225,6 +247,9 @@ namespace Client
             chatBox.Show();
         }
 
+        /// <summary>
+        ///  Aggiorna chat esistente
+        /// </summary>
         private void UpdateChat(ChatBox chatBox, ircMessage msg)
         {
             chatBox.AddMessage(msg.sender_username + " : " + msg.message);
@@ -249,6 +274,9 @@ namespace Client
             }
         }
 
+        /// <summary>
+        ///  Rimuove chat dalla lista di chat attive
+        /// </summary>
         public void EndChat(ChatBox chatBox)
         {
             chatList.Remove(chatBox);
