@@ -31,12 +31,18 @@ namespace Server
 
         public Server()
         {
+            //Thread per rispondere alle richieste di discovery dei Client
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
 
+            //Thread per verificare che i Client siano ancora connessi
             Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
 
             IPAddress ip = IPAddress.Any;
+
+            //Listener in ascolto per connessioni TCP dai client per inviare messaggi
             TcpListener server = new TcpListener(ip, port);
+
+            //Listener in ascolto per connessioni TCP per il ping da parte dei client per verificare che il server sia attivo
             TcpListener pingListener = new TcpListener(ip, pingPort);
 
             onlineUsers = new List<ircUser>();
@@ -44,8 +50,11 @@ namespace Server
 
             try
             {
+
                 server.Start();
                 pingListener.Start();
+
+                //Richiedo il nome del server da presentare al client
                 do {
                     Console.Write("Inserisci un nome per il tuo server: ");
                     serverName = Console.ReadLine();
@@ -71,15 +80,18 @@ namespace Server
 
                 while (true) {
 
+                    //Ricevo connessioni TCP dai Client
                     client = server.AcceptTcpClient();
 
                     byte[] buffer = new byte[1024];
                     NetworkStream stream = client.GetStream();
 
+                    //Leggo i messaggi inviati sullo stream
                     int len = stream.Read(buffer, 0, buffer.Length);
                     
                     ircMessage msg = (ircMessage)ircMessage.BytesToObj(buffer, len);
                     string senderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+
                     switch (msg.action) {
                         case 0: //Registrazione nuovo utente
                             Console.WriteLine("REGISTER_USER_REQUEST Received");
@@ -165,6 +177,9 @@ namespace Server
         }
         #endregion
 
+        /// <summary>
+        /// Per ogni utente all'interno della lista di utenti online cerca di creare una connessione TCP per verificare che siano ancora online
+        /// </summary>
         void PingUsers() {
             while (true) {
 
@@ -173,6 +188,7 @@ namespace Server
                         Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")}:Invio ping TCP a {user.username} all'indirizzo {user.address}");
                         TcpClient tcpClient = new TcpClient();
 
+                        //Provo ad avviare una connessione al client, il tempo di scadenza della connessione TCP non è modificabile
                         try {
                             tcpClient.Connect(user.address, port);
                             Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")}:Connessione TCP avvenuta con successo per {user.username}");
@@ -182,6 +198,7 @@ namespace Server
                             Logout(user.username);
                         }
 
+                        //Elimino la connessione
                         try {
                             tcpClient.Dispose();
                         } catch (Exception ex) {
@@ -195,6 +212,13 @@ namespace Server
 
         #region userAuth
 
+        /// <summary>
+        /// Autentica l'utente con le credenziali fornite
+        /// </summary>
+        /// <param name="username">Nome utente <see cref="string"/></param>
+        /// <param name="password">Password dell'utente <see cref="string"/></param>
+        /// <param name="address">Indirizzo IP da cui viene effettuata la richiesta <see cref="string"/></param>
+        /// <returns><see cref="List{ircUser}"/> Lista di utenti</returns>
         private List<ircUser> Login(string username, string password, string address) {
 
             Console.WriteLine($"Inizio processo di login per {username}:{password}");
@@ -225,6 +249,13 @@ namespace Server
             return new List<ircUser>();
         }
 
+        /// <summary>
+        /// Registra un nuovo account sul DB con le credenziali fornite
+        /// </summary>
+        /// <param name="username"><see cref="string"/> nome utente</param>
+        /// <param name="password"><see cref="string"/> password</param>
+        /// <returns><see cref="int"/>0 fallito, altrimenti successo</returns>
+        /// <remarks>Il controllo della ripetizione della password bisogna farla dalla parte richiamante della funzione</remarks>
         private int Register(string username, string password) {
             Console.WriteLine($"Inizio processo di registrazione per {username}");
             DBManager dbManager = new DBManager();
@@ -235,6 +266,10 @@ namespace Server
             });
         }
 
+        /// <summary>
+        /// Rimuove un utente dalla lista di utenti online
+        /// </summary>
+        /// <param name="username"><see cref="string"/>nome utene da rimuovere da trovare all'interno della lista </param>
         private void Logout(string username) {
             Console.WriteLine($"Inizio il processo di LOGOUT per {username}");
             //Cerco se l'utente è presente nella lista di utenti online su questo server

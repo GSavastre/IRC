@@ -15,11 +15,18 @@ using System.Windows.Forms;
 namespace Client {
     public partial class ServerSearch : Form {
 
+        //Thread che una volta avviato invia messagi di discovery sulla rete locale
         Thread discoveryThread;
         Thread pingServersThread;
-        Login loginForm;
+
+        //Lista di server disponibili Key: Nome server, Value: Indirizzo
+        //TOFIX: Per adesso se due server hanno lo stesso nome, la lista di server non aggiungerà il secondo server
         Dictionary<string, string> serversList;
         int serverPingPort = 7779;
+
+        Login loginForm;
+
+        #region AddToList delegate method
 
         delegate void AddToListCallback(string text);
         delegate void RemoveFromListCallback(KeyValuePair<string, string> server);
@@ -30,25 +37,31 @@ namespace Client {
             lbServer.Items.Remove(server.Key);
         }
 
+        /// <summary>
+        /// Aggiunge un elemento alla lista di server disponibili
+        /// </summary>
+        /// <param name="text"><see cref="string"/> di struttura nome:indirizzo</param>
         private void AddToList(string text) {
-            // InvokeRequired required compares the thread ID of the
-            // calling thread to the thread ID of the creating thread.
-            // If these threads are different, it returns true.
+            //InvokeRequired confronta l'identificativo del thread chiamante
+            //con l'identificativo del thread di creazione
+            //Se questi due thread sono diversi, ritorna true.
             if (this.lbServer.InvokeRequired) {
                 AddToListCallback d = new AddToListCallback(AddToList);
                 this.Invoke(d, new object[] { text });
             } else {
                 string[] serverInfo = text.Split(':').ToArray();
 
+                //Controllo che l'array sia stato creato correttamente
                 if (serverInfo.Count().Equals(2)) {
-                    //Text > serverName:serverAddress
+                    //Serverinfo[]{nome, indirizzo}
                     string serverName = serverInfo[0];
                     string serverAddress = serverInfo[1];
 
-
+                    //Controllo che non ci sia già il server nella lista Dictionary
                     if (!serversList.ContainsKey(serverName)) {
                         serversList.Add(serverName, serverAddress);
 
+                        //Controllo che il server non sia già stato aggiunto alla lista di server disponibili
                         if (!lbServer.Items.Contains(serverName)) {
 
                             lbServer.Items.Add(serverName);
@@ -57,7 +70,8 @@ namespace Client {
                 }
             }
         }
-
+        #endregion
+     
         void PingServer()
         {
             RemoveFromListCallback remove = new RemoveFromListCallback(RemoveFromList);
@@ -97,20 +111,25 @@ namespace Client {
 
 
         #region ServerDiscovery
+        /// <summary>
+        /// Funzione che invia richieste UDP in broadcast sulla LAN per la scoperta di server disponibili (Da usare in un thread)
+        /// </summary>
         void DiscoverServers() {
-            //La porta su cui il server ascolterà le richieste di discovery, cambio porta petchè tco non ammette broadcast
+            //La porta su cui il server ascolterà le richieste di discovery UDP
             const int port = 7778;
 
             //Messaggio di discovery
             byte[] requestData = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_REQUEST");
+
+            //Messaggio di risposta del server, così non tengo conto di possibili server malevoli che rispondono ad ogni richiesta broadcast
             byte[] replyDataConf = Encoding.ASCII.GetBytes("DISCOVER_IRCSERVER_ACK");
 
             //Prendo gli indirizzi di tutte le interfacce di questo pc
             string hostname = Dns.GetHostName();
+
             #pragma warning disable CS0618 // Type or member is obsolete
             IPHostEntry allLocalNetworkAddresses = Dns.Resolve(hostname);
-#pragma warning restore CS0618 // Type or member is obsolete
-            serversList = new Dictionary<string, string>();
+            #pragma warning restore CS0618 // Type or member is obsolete
 
             while (true) {
                 //Attraverso tutte le interfacce
@@ -157,12 +176,13 @@ namespace Client {
                         //Ricevo il messaggio, l'interfaccia remota provverà le informazioni necessarie come indirizzo IP e porta
                         try {
 
+                            //response[]{nome, indirizzo}
                             string[] response = Encoding.ASCII.GetString(buffer).Split(':').ToArray();
-                            //MessageBox.Show($"Received {response} from {tempRemoteEP.ToString()}", "Notice");
 
                             if (response[0].Equals(Encoding.ASCII.GetString(replyDataConf))) {
-                                //Qui bisognerebbe filtrare l'indirizzo IP dall'interfaccia remota
+                                //Creo la stringa con struttura nomeServer:indirizzoServer
                                 string serverInfo = response[1] + ":" + tempRemoteEP.ToString().Split(':').ToArray()[0];
+                                //Chiamo metodo delegato per l'aggiunta del server
                                 AddToList(serverInfo);
                             }
                         } catch (Exception e) {
@@ -177,6 +197,9 @@ namespace Client {
         }
 #endregion
 
+        /// <summary>
+        /// Costruttore ServerSearch()
+        /// </summary>
         public ServerSearch() {
             InitializeComponent();
 
@@ -195,15 +218,22 @@ namespace Client {
             pingServersThread.Start();
         }
 
+        /// <summary>
+        /// Dopo aver selezionato il server tenta la connessione
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnSubmit_Click(object sender, EventArgs e) {
 
             string selectedServerName = lbServer.GetItemText(lbServer.SelectedItem);
             string selectedServerAddress = string.Empty;
 
+            //Prendo l'indirizzo del server con nome selectedServerName
             if (!serversList.TryGetValue(selectedServerName, out selectedServerAddress)) {
                 selectedServerAddress = string.Empty;
             }
             
+            //Avvio il form di Login solo se si è selezionato un server dalla lista
             if (string.IsNullOrEmpty(selectedServerAddress)) {
                 MessageBox.Show("Prima di continuare devi scegliere un server disponibile","Avviso");
             } else {
@@ -232,7 +262,6 @@ namespace Client {
                     this.Show();
                 }
                 catch {}
-                    
             }
         }
 
