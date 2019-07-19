@@ -71,9 +71,7 @@ namespace Client {
             }
         }
         #endregion
-       
-        #region ServerDiscovery
-
+     
         void PingServer()
         {
             RemoveFromListCallback remove = new RemoveFromListCallback(RemoveFromList);

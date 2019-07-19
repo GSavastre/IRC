@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj": {}
+    "D:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj": {
+    "D:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj",
+        "projectUniqueName": "D:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj",
         "projectName": "IRC",
-        "projectPath": "C:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj",
+        "projectPath": "D:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\IRC.csproj",
         "packagesPath": "C:\\Users\\Gabriele\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\obj\\",
+        "outputPath": "D:\\Users\\Gabriele\\source\\repos\\IRC\\Message\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "D:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
           "C:\\Users\\Gabriele\\AppData\\Roaming\\NuGet\\NuGet.Config",

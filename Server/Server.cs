@@ -31,12 +31,18 @@ namespace Server
 
         public Server()
         {
+            //Thread per rispondere alle richieste di discovery dei Client
             Thread discoveryListener = new Thread(new ThreadStart(DiscoveryListener));
 
+            //Thread per verificare che i Client siano ancora connessi
             Thread pingOnlineUsers = new Thread(new ThreadStart(PingUsers));
 
             IPAddress ip = IPAddress.Any;
+
+            //Listener in ascolto per connessioni TCP dai client per inviare messaggi
             TcpListener server = new TcpListener(ip, port);
+
+            //Listener in ascolto per connessioni TCP per il ping da parte dei client per verificare che il server sia attivo
             TcpListener pingListener = new TcpListener(ip, pingPort);
 
             onlineUsers = new List<ircUser>();

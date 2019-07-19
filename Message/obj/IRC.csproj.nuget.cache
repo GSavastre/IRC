@@ -1,9 +1,5 @@
 {
   "version": 1,
-<<<<<<< HEAD
-  "dgSpecHash": "N+5EHNae51nhtodPQmf/uQAuhadx3EiPLykJ8rhsME+l3LGmKb9q+fvJCcmgjRfcRxzYapLAK2THasVvH81TqQ==",
-=======
-  "dgSpecHash": "Z4RPg/+zuf2rQ99RttYSFUsd504vKDZoDxJ7imwNJjMgD8vFbsGpgq/W9k75iy/dNoQ4jsYbgRyflWVKZni2yg==",
->>>>>>> CodeRefacoring
+  "dgSpecHash": "79i1vveMzVL6gnuyiojorC6J0UGXWWup9DsHfRhLNjanRp/1WL25kFFVnG6jN4Yk5ZPIZowjDOadtm5oR1Xfhg==",
   "success": true
 }
