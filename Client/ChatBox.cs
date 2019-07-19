@@ -18,7 +18,7 @@ namespace Client
         const int port = 7777;
         TcpClient client = null;
         string partner_username;
-        Home home_reference = null;
+        Home home_reference = null; //variabile di referenza per utilizzare il form home 
 
         public ChatBox(string partner_username, string server_addr, Home home)
         {
@@ -29,10 +29,19 @@ namespace Client
             home_reference = home;
         }
 
+        /// <summary>
+        /// aggiunge messaggio al form chat
+        /// </summary>
+        /// <param name="message"></param>
         public void AddMessage(String message) {
             lb_chat.Items.Add(message);
         }
 
+        /// <summary>
+        /// Invio del messaggio
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btn_send_Click(object sender, EventArgs e)
         {
             try
@@ -57,7 +66,11 @@ namespace Client
                 MessageBox.Show("Chat send exception : " + ex.Message);
             }
         }
-    
+        
+        /// <summary>
+        /// Chiudendo il form dalla "x" si stoppa il listenere e si chiude il thread di ascolto
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
