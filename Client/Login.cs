@@ -16,10 +16,15 @@ namespace Client
 {
     public partial class Login : Form
     {
+        //Indirizzo e porta del server con cui comunicare
         string server_addr;
         static int server_port = 7777;
+
         TcpClient client;
         List<ircUser> online_users = new List<ircUser>(); /// lista di utenti
+
+
+        //Ascolto per connessioni TCP su questa macchina
         TcpListener listener = new TcpListener(IPAddress.Any, server_port);
 
         delegate void CloseFormCallback();
